@@ -458,9 +458,14 @@
         }
 
         // --- Rendering UI ---
+        // Penambahan Debounce agar pencarian tidak memberatkan browser
+        let searchTimeout;
         window.handleSearch = function(val) {
-            currentSearch = val.toLowerCase();
-            renderProjects();
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                currentSearch = val.toLowerCase();
+                renderProjects();
+            }, 300); // Tunggu 300ms setelah selesai mengetik baru di-render
         };
 
         window.handleFilter = function(val) {
