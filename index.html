@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Way to Become a Billionaire</title>
+    <title>Proyek - Baginda Raja</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script>
@@ -36,7 +36,6 @@
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         
-        /* Hilangkan ikon kalender bawaan browser agar lebih bersih */
         input[type="date"]::-webkit-calendar-picker-indicator {
             cursor: pointer;
             opacity: 0;
@@ -54,10 +53,10 @@
     <header class="bg-burgundy-800 text-white shadow-md sticky top-0 z-30">
         <div class="max-w-6xl mx-auto px-6 py-4 flex justify-between items-center">
             <h1 class="text-2xl font-bold flex items-center gap-2 tracking-wide">
-                <i class="ph-fill ph-kanban"></i> WAY TO BECOME A BILLIONAIRE
+                <i class="ph-fill ph-crown"></i> SISTEM BAGINDA
             </h1>
             <div class="text-sm font-medium bg-burgundy-900/60 px-4 py-1.5 rounded-full border border-burgundy-700/50" id="header-stats">
-                0 Proyek Aktif
+                Memuat data...
             </div>
         </div>
     </header>
@@ -65,71 +64,202 @@
     <!-- Main Content -->
     <main class="max-w-6xl mx-auto px-6 py-10">
         
-        <!-- Form Tambah Proyek -->
-        <div class="mb-8 bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center transition-shadow focus-within:shadow-md focus-within:border-burgundy-300">
-            <span class="pl-4 text-slate-400 hidden sm:block"><i class="ph-duotone ph-folder-plus text-2xl"></i></span>
-            <form id="project-form" class="flex-1 flex flex-col sm:flex-row gap-3 w-full p-2 sm:p-0 sm:ml-2">
-                <input 
-                    type="text" 
-                    id="project-input" 
-                    class="flex-1 px-3 py-2 border-b border-slate-200 sm:border-none rounded-none focus:ring-0 outline-none bg-transparent placeholder-slate-400 text-lg" 
-                    placeholder="Apa nama proyek baru ini?"
-                    autocomplete="off"
-                    required
-                >
-                <div class="flex gap-2 w-full sm:w-auto items-center border-l sm:pl-4 border-slate-100 flex-wrap sm:flex-nowrap">
-                    <div class="flex items-center border-b border-transparent hover:border-slate-300 transition-colors">
-                        <i class="ph-duotone ph-warning-circle text-slate-400 mr-1"></i>
-                        <select id="project-priority" class="bg-transparent outline-none cursor-pointer text-slate-600 text-sm font-semibold" title="Prioritas Proyek">
-                            <option value="Tinggi">Tinggi</option>
-                            <option value="Sedang" selected>Sedang</option>
-                            <option value="Rendah">Rendah</option>
-                        </select>
+        <!-- Navigasi Tab -->
+        <nav class="flex gap-2 sm:gap-6 mb-8 border-b border-slate-200 overflow-x-auto whitespace-nowrap pb-1">
+            <button onclick="switchTab('projects')" id="tab-projects" class="pb-3 border-b-2 border-burgundy-600 font-bold text-burgundy-800 transition-colors flex items-center gap-2 px-2">
+                <i class="ph-duotone ph-kanban text-xl"></i> Manajemen Proyek
+            </button>
+            <button onclick="switchTab('routines')" id="tab-routines" class="pb-3 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 px-2">
+                <i class="ph-duotone ph-check-square-offset text-xl"></i> Rutinitas Harian
+            </button>
+            <button onclick="switchTab('journals')" id="tab-journals" class="pb-3 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 px-2">
+                <i class="ph-duotone ph-book-open-text text-xl"></i> Jurnal Pribadi
+            </button>
+        </nav>
+
+        <!-- ==================== WRAPPER PROYEK ==================== -->
+        <div id="project-view" class="block">
+            <!-- Form Tambah Proyek -->
+            <div class="mb-8 bg-white p-3 rounded-2xl shadow-sm border border-slate-200 flex flex-col sm:flex-row items-center transition-shadow focus-within:shadow-md focus-within:border-burgundy-300">
+                <span class="pl-4 text-slate-400 hidden sm:block"><i class="ph-duotone ph-folder-plus text-2xl"></i></span>
+                <form id="project-form" class="flex-1 flex flex-col sm:flex-row gap-3 w-full p-2 sm:p-0 sm:ml-2">
+                    <input 
+                        type="text" 
+                        id="project-input" 
+                        class="flex-1 px-3 py-2 border-b border-slate-200 sm:border-none rounded-none focus:ring-0 outline-none bg-transparent placeholder-slate-400 text-lg" 
+                        placeholder="Apa nama proyek baru ini?"
+                        autocomplete="off"
+                        required
+                    >
+                    <div class="flex gap-2 w-full sm:w-auto items-center border-l sm:pl-4 border-slate-100 flex-wrap sm:flex-nowrap">
+                        <div class="flex items-center border-b border-transparent hover:border-slate-300 transition-colors">
+                            <i class="ph-duotone ph-warning-circle text-slate-400 mr-1"></i>
+                            <select id="project-priority" class="bg-transparent outline-none cursor-pointer text-slate-600 text-sm font-semibold" title="Prioritas Proyek">
+                                <option value="Tinggi">Tinggi</option>
+                                <option value="Sedang" selected>Sedang</option>
+                                <option value="Rendah">Rendah</option>
+                            </select>
+                        </div>
+                        <span class="text-slate-300 hidden sm:inline">-</span>
+                        <div class="date-input-wrapper flex items-center border-b border-transparent hover:border-slate-300 transition-colors">
+                            <i class="ph-duotone ph-calendar-plus text-slate-400 mr-1"></i>
+                            <input type="date" id="project-start" class="bg-transparent outline-none cursor-pointer text-slate-600 w-28 sm:w-auto text-sm" title="Target Mulai">
+                        </div>
+                        <span class="text-slate-300">-</span>
+                        <div class="date-input-wrapper flex items-center border-b border-transparent hover:border-slate-300 transition-colors">
+                            <i class="ph-duotone ph-calendar-check text-slate-400 mr-1"></i>
+                            <input type="date" id="project-due" class="bg-transparent outline-none cursor-pointer text-slate-600 w-28 sm:w-auto text-sm" title="Target Selesai">
+                        </div>
                     </div>
-                    <span class="text-slate-300 hidden sm:inline">-</span>
-                    <div class="date-input-wrapper flex items-center border-b border-transparent hover:border-slate-300 transition-colors">
-                        <i class="ph-duotone ph-calendar-plus text-slate-400 mr-1"></i>
-                        <input type="date" id="project-start" class="bg-transparent outline-none cursor-pointer text-slate-600 w-28 sm:w-auto text-sm" title="Target Mulai">
+                    <button type="submit" class="bg-burgundy-700 text-white px-8 py-2.5 rounded-xl hover:bg-burgundy-800 active:scale-95 transition-all font-semibold text-sm w-full sm:w-auto shadow-sm shadow-burgundy-700/30 mt-2 sm:mt-0">
+                        Buat Proyek
+                    </button>
+                </form>
+            </div>
+
+            <!-- Filter & Search Bar -->
+            <div class="mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="relative w-full sm:w-96">
+                    <i class="ph-duotone ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
+                    <input type="text" id="search-input" onkeyup="handleSearch(this.value)" class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-burgundy-500 transition-shadow text-sm shadow-sm" placeholder="Cari proyek...">
+                </div>
+                <div class="flex items-center gap-2 w-full sm:w-auto">
+                    <i class="ph-duotone ph-funnel text-slate-400 text-lg hidden sm:block"></i>
+                    <select id="filter-select" onchange="handleFilter(this.value)" class="w-full sm:w-auto bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-burgundy-500 cursor-pointer shadow-sm">
+                        <option value="All">Semua Status</option>
+                        <option value="Plan">Plan</option>
+                        <option value="Execute">Execute</option>
+                        <option value="Finish">Finish</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Grid Kartu Proyek -->
+            <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+            <!-- State Kosong -->
+            <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-slate-400">
+                <i class="ph-duotone ph-folder-dashed text-7xl mb-4 text-slate-300"></i>
+                <h3 class="text-lg font-medium text-slate-600" id="empty-title">Belum ada proyek</h3>
+                <p class="text-sm mt-1" id="empty-desc">Silakan buat proyek baru untuk memulai.</p>
+            </div>
+        </div>
+
+        <!-- ==================== WRAPPER RUTINITAS HARIAN ==================== -->
+        <div id="routine-view" class="hidden">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex items-center justify-between mb-8 bg-burgundy-50 p-6 rounded-3xl border border-burgundy-100">
+                    <div>
+                        <h2 class="text-2xl font-bold text-burgundy-900 flex items-center gap-2">
+                            <i class="ph-duotone ph-sun text-3xl"></i> Daftar Ceklis Hari Ini
+                        </h2>
+                        <p class="text-burgundy-700 font-medium mt-1" id="routine-today-date"></p>
                     </div>
-                    <span class="text-slate-300">-</span>
-                    <div class="date-input-wrapper flex items-center border-b border-transparent hover:border-slate-300 transition-colors">
-                        <i class="ph-duotone ph-calendar-check text-slate-400 mr-1"></i>
-                        <input type="date" id="project-due" class="bg-transparent outline-none cursor-pointer text-slate-600 w-28 sm:w-auto text-sm" title="Target Selesai">
+                    <div class="text-center bg-white px-5 py-3 rounded-xl shadow-sm border border-burgundy-100">
+                        <span class="block text-xs font-bold text-slate-400 uppercase tracking-wider">Tuntas Hari Ini</span>
+                        <span class="text-2xl font-black text-burgundy-700" id="routine-progress-text">0/0</span>
                     </div>
                 </div>
-                <button type="submit" class="bg-burgundy-700 text-white px-8 py-2.5 rounded-xl hover:bg-burgundy-800 active:scale-95 transition-all font-semibold text-sm w-full sm:w-auto shadow-sm shadow-burgundy-700/30 mt-2 sm:mt-0">
-                    Buat Proyek
-                </button>
-            </form>
-        </div>
 
-        <!-- Filter & Search Bar -->
-        <div class="mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
-            <div class="relative w-full sm:w-96">
-                <i class="ph-duotone ph-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-lg"></i>
-                <input type="text" id="search-input" onkeyup="handleSearch(this.value)" class="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-burgundy-500 transition-shadow text-sm shadow-sm" placeholder="Cari proyek...">
+                <!-- Form Tambah Rutinitas -->
+                <form id="routine-form" class="flex gap-3 mb-8">
+                    <input 
+                        type="text" 
+                        id="routine-input" 
+                        class="flex-1 px-5 py-3.5 bg-white border border-slate-200 rounded-2xl shadow-sm focus:outline-none focus:ring-2 focus:ring-burgundy-500 text-base transition-all" 
+                        placeholder="Tambahkan kebiasaan atau aktivitas harian baru..."
+                        autocomplete="off"
+                        required
+                    >
+                    <button type="submit" class="bg-burgundy-700 text-white px-8 py-3.5 rounded-2xl hover:bg-burgundy-800 active:scale-95 transition-all font-bold shadow-sm shadow-burgundy-700/30 flex items-center gap-2">
+                        <i class="ph-bold ph-plus"></i> Tambah
+                    </button>
+                </form>
+
+                <!-- Header Kolom Rekam Jejak -->
+                <div id="routine-tracker-header" class="hidden sm:flex justify-end pr-20 mb-2">
+                    <div class="flex gap-1.5 text-center" id="tracker-days-header">
+                        <!-- Render JS -->
+                    </div>
+                </div>
+
+                <!-- Daftar Rutinitas -->
+                <div class="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden">
+                    <ul id="routine-list" class="divide-y divide-slate-100">
+                        <!-- Render JS -->
+                    </ul>
+                    <div id="routine-empty-state" class="hidden flex-col items-center justify-center py-16 text-slate-400">
+                        <i class="ph-duotone ph-check-square-offset text-6xl mb-4 text-slate-300"></i>
+                        <h3 class="text-base font-bold text-slate-600">Belum Ada Rutinitas</h3>
+                        <p class="text-sm mt-1 text-center">Tambahkan aktivitas yang ingin Baginda lakukan setiap hari.</p>
+                    </div>
+                </div>
             </div>
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-                <i class="ph-duotone ph-funnel text-slate-400 text-lg hidden sm:block"></i>
-                <select id="filter-select" onchange="handleFilter(this.value)" class="w-full sm:w-auto bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-sm font-semibold text-slate-700 focus:outline-none focus:ring-2 focus:ring-burgundy-500 cursor-pointer shadow-sm">
-                    <option value="All">Semua Status</option>
-                    <option value="Plan">Plan</option>
-                    <option value="Execute">Execute</option>
-                    <option value="Finish">Finish</option>
-                </select>
+        </div>
+
+        <!-- ==================== WRAPPER JURNAL ==================== -->
+        <div id="journal-view" class="hidden">
+            <div class="flex flex-col lg:flex-row gap-8">
+                <!-- Kalender -->
+                <div class="w-full lg:w-1/3 flex-shrink-0">
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 sticky top-24">
+                        <div class="flex justify-between items-center mb-6">
+                            <button onclick="changeMonth(-1)" class="p-2 text-slate-400 hover:text-burgundy-700 hover:bg-burgundy-50 rounded-xl transition-colors"><i class="ph-bold ph-caret-left text-lg"></i></button>
+                            <h3 id="calendar-month-year" class="font-bold text-lg text-slate-800 capitalize tracking-wide">Bulan Tahun</h3>
+                            <button onclick="changeMonth(1)" class="p-2 text-slate-400 hover:text-burgundy-700 hover:bg-burgundy-50 rounded-xl transition-colors"><i class="ph-bold ph-caret-right text-lg"></i></button>
+                        </div>
+                        <div class="grid grid-cols-7 gap-1 text-center text-xs font-bold text-slate-400 mb-3 uppercase tracking-wider">
+                            <div>Min</div><div>Sen</div><div>Sel</div><div>Rab</div><div>Kam</div><div>Jum</div><div>Sab</div>
+                        </div>
+                        <div id="calendar-grid" class="grid grid-cols-7 gap-1"></div>
+                    </div>
+                </div>
+
+                <!-- Area Catatan -->
+                <div class="w-full lg:w-2/3 flex flex-col gap-6">
+                    <!-- Form Tambah Jurnal -->
+                    <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-200 transition-shadow focus-within:shadow-md focus-within:border-burgundy-300">
+                        <div class="flex items-center justify-between mb-4 pb-4 border-b border-slate-100">
+                            <h4 class="font-bold text-slate-800 flex items-center gap-2"><i class="ph-duotone ph-pen-nib text-burgundy-600 text-xl"></i> Tulis Jurnal</h4>
+                            <div class="text-xs font-bold bg-burgundy-50 text-burgundy-700 px-4 py-1.5 rounded-full border border-burgundy-100 shadow-sm" id="form-date-display"></div>
+                        </div>
+                        <form id="journal-form" class="flex flex-col gap-4">
+                            <div class="flex items-center gap-2 bg-slate-50 px-4 py-3 rounded-xl border border-slate-200">
+                                <i class="ph-duotone ph-bookmarks text-slate-500 text-lg"></i>
+                                <select id="journal-type" class="bg-transparent outline-none text-sm font-bold text-slate-700 w-full cursor-pointer">
+                                    <option value="Syukur">🙏 Rasa Syukur</option>
+                                    <option value="Pencapaian">🏆 Pencapaian Kecil</option>
+                                    <option value="Pelajaran">💡 Evaluasi & Pelajaran</option>
+                                    <option value="Emosi">🌧️ Tumpahan Emosi (Curhat)</option>
+                                    <option value="Ide">✨ Ide & Inspirasi</option>
+                                </select>
+                            </div>
+                            <textarea id="journal-content" rows="4" class="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-burgundy-500 transition-all text-sm resize-none" placeholder="Tuliskan isi pikiran, rasa syukur, atau pelajaran hari ini, Baginda..." required></textarea>
+                            <div class="flex justify-end mt-2">
+                                <button type="submit" class="bg-burgundy-700 text-white px-8 py-3 rounded-xl hover:bg-burgundy-800 active:scale-95 transition-all font-bold text-sm shadow-md shadow-burgundy-700/20 flex items-center gap-2">
+                                    <i class="ph-bold ph-floppy-disk"></i> Simpan Catatan
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Header List -->
+                    <div class="flex items-center gap-3 mt-2">
+                        <h3 class="font-bold text-xl text-slate-800">Catatan Tanggal Ini</h3>
+                        <div class="h-px bg-slate-200 flex-1"></div>
+                    </div>
+
+                    <!-- Grid Jurnal -->
+                    <div id="journal-grid" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+                    
+                    <!-- State Kosong Jurnal -->
+                    <div id="journal-empty-state" class="hidden flex-col items-center justify-center py-12 text-slate-400 bg-white rounded-3xl border border-dashed border-slate-200">
+                        <i class="ph-duotone ph-book-open text-6xl mb-4 text-slate-300"></i>
+                        <h3 class="text-base font-bold text-slate-600">Buku Jurnal Masih Kosong</h3>
+                        <p class="text-sm mt-1 text-center px-4">Belum ada catatan untuk tanggal ini.<br>Silakan abadikan memori Baginda di atas.</p>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <!-- Grid Kartu Proyek -->
-        <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <!-- Kartu dirender JS -->
-        </div>
-
-        <!-- State Kosong -->
-        <div id="empty-state" class="hidden flex-col items-center justify-center py-20 text-slate-400">
-            <i class="ph-duotone ph-folder-dashed text-7xl mb-4 text-slate-300"></i>
-            <h3 class="text-lg font-medium text-slate-600" id="empty-title">Belum ada proyek</h3>
-            <p class="text-sm mt-1" id="empty-desc">Silakan buat proyek baru untuk memulai.</p>
         </div>
 
     </main>
@@ -137,7 +267,6 @@
     <!-- Modal Detail Proyek -->
     <div id="project-modal" class="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-sm items-center justify-center p-4 invisible opacity-0 transition-opacity duration-300 flex">
         <div class="modal-content bg-white w-full max-w-2xl rounded-2xl shadow-2xl flex flex-col max-h-[90vh] overflow-hidden transform translate-y-8 scale-95 transition-all duration-300">
-            
             <!-- Modal Header -->
             <div class="px-8 py-6 border-b border-slate-100 bg-white">
                 <div class="flex justify-between items-start mb-5">
@@ -148,7 +277,6 @@
                                 <i class="ph-bold ph-pencil-simple text-lg"></i>
                             </button>
                         </div>
-                        
                         <div class="text-sm text-slate-500 mt-2 flex items-center gap-2 font-medium bg-slate-50 p-2 rounded-lg inline-flex border border-slate-100 flex-wrap">
                             <i class="ph-duotone ph-warning-circle"></i>
                             <select id="modal-project-priority" onchange="updateActiveProject('priority', this.value)" class="bg-transparent outline-none cursor-pointer font-bold tracking-wide uppercase text-xs" title="Prioritas Proyek">
@@ -156,9 +284,7 @@
                                 <option value="Sedang" class="text-slate-700">SEDANG</option>
                                 <option value="Rendah" class="text-slate-700">RENDAH</option>
                             </select>
-
                             <span class="text-slate-300 mx-1">|</span>
-
                             <i class="ph-duotone ph-calendar-blank"></i> 
                             <div class="date-input-wrapper flex items-center border-b border-transparent hover:border-slate-300 transition-colors">
                                 <input type="date" id="modal-project-start" onchange="updateActiveProject('startDate', this.value)" class="bg-transparent outline-none cursor-pointer text-slate-600 w-28 text-center" title="Target Mulai">
@@ -174,8 +300,6 @@
                         <i class="ph-bold ph-x text-xl"></i>
                     </button>
                 </div>
-                
-                <!-- Progress Bar di Modal -->
                 <div class="flex items-center gap-4">
                     <div class="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
                         <div id="modal-progress-bar" class="h-full bg-burgundy-600 rounded-full transition-all duration-500" style="width: 0%"></div>
@@ -183,33 +307,17 @@
                     <span id="modal-progress-text" class="text-sm font-bold text-slate-600 w-10 text-right">0%</span>
                 </div>
             </div>
-
             <!-- Modal Body (Sub-pekerjaan) -->
             <div class="flex-1 overflow-y-auto p-8 bg-slate-50/50">
                 <div class="flex justify-between items-end mb-5">
                     <h3 class="font-bold text-slate-800 text-lg">Daftar Pekerjaan</h3>
                 </div>
-
-                <ul id="modal-subtask-list" class="space-y-4 mb-8">
-                    <!-- Sub-pekerjaan dirender JS -->
-                </ul>
-
-                <!-- Form Tambah Sub-pekerjaan -->
+                <ul id="modal-subtask-list" class="space-y-4 mb-8"></ul>
                 <form id="subtask-form" class="flex gap-3 mt-4">
-                    <input 
-                        type="text" 
-                        id="subtask-input" 
-                        class="flex-1 px-5 py-3 bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-burgundy-500 focus:border-transparent text-sm transition-all" 
-                        placeholder="Tambah detail pekerjaan baru..."
-                        autocomplete="off"
-                        required
-                    >
-                    <button type="submit" class="bg-burgundy-100 text-burgundy-800 hover:bg-burgundy-200 px-6 py-3 rounded-xl text-sm font-bold transition-colors shadow-sm">
-                        Tambah
-                    </button>
+                    <input type="text" id="subtask-input" class="flex-1 px-5 py-3 bg-white border border-slate-200 rounded-xl shadow-sm focus:outline-none focus:ring-2 focus:ring-burgundy-500 focus:border-transparent text-sm transition-all" placeholder="Tambah detail pekerjaan baru..." autocomplete="off" required>
+                    <button type="submit" class="bg-burgundy-100 text-burgundy-800 hover:bg-burgundy-200 px-6 py-3 rounded-xl text-sm font-bold transition-colors shadow-sm">Tambah</button>
                 </form>
             </div>
-            
             <!-- Modal Footer -->
             <div class="px-8 py-5 border-t border-slate-100 bg-white flex justify-between items-center">
                 <button onclick="deleteActiveProject()" class="text-red-500 hover:text-red-700 hover:bg-red-50 px-4 py-2 rounded-lg text-sm font-semibold transition-colors flex items-center gap-2">
@@ -222,16 +330,11 @@
         </div>
     </div>
 
-    <!-- Toast Container -->
+    <!-- Modals (Toast, Confirm, Prompt) -->
     <div id="toast-container" class="fixed bottom-6 right-6 z-[70] flex flex-col gap-3 pointer-events-none"></div>
-
-    <!-- Custom Confirm Modal -->
     <div id="confirm-modal" class="fixed inset-0 z-[80] bg-slate-900/50 backdrop-blur-sm items-center justify-center p-4 invisible opacity-0 transition-opacity duration-300 flex">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden transform translate-y-4 scale-95 transition-all duration-300 p-6">
-            <div class="flex items-center gap-3 mb-3 text-red-600">
-                <i class="ph-fill ph-warning-circle text-3xl"></i>
-                <h3 class="text-lg font-bold text-slate-800">Konfirmasi</h3>
-            </div>
+            <div class="flex items-center gap-3 mb-3 text-red-600"><i class="ph-fill ph-warning-circle text-3xl"></i><h3 class="text-lg font-bold text-slate-800">Konfirmasi</h3></div>
             <p id="confirm-message" class="text-slate-600 text-sm mb-6">Apakah Baginda yakin?</p>
             <div class="flex justify-end gap-3">
                 <button onclick="closeConfirm()" class="px-4 py-2 text-sm font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-colors">Batal</button>
@@ -239,8 +342,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Custom Prompt Modal -->
     <div id="prompt-modal" class="fixed inset-0 z-[80] bg-slate-900/50 backdrop-blur-sm items-center justify-center p-4 invisible opacity-0 transition-opacity duration-300 flex">
         <div class="bg-white rounded-2xl shadow-xl w-full max-w-sm overflow-hidden transform translate-y-4 scale-95 transition-all duration-300 p-6">
             <h3 id="prompt-title" class="text-lg font-bold text-slate-800 mb-4">Ubah Nilai</h3>
@@ -257,7 +358,7 @@
         import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase Baginda Raja
+        // Konfigurasi Firebase
         const firebaseConfig = {
             apiKey: "AIzaSyAAj5a6tyrYxzAdNMfnMIb8ViDdd73subQ",
             authDomain: "todolist-d542d.firebaseapp.com",
@@ -273,12 +374,15 @@
 
         // --- State Management ---
         let tasks = [];
+        let journals = [];
+        let routines = [];
         let currentSearch = '';
         let currentFilter = 'All';
         let activeProjectId = null;
         let user = null;
+        let currentTab = 'projects';
 
-        // --- Konfigurasi Prioritas ---
+        // --- Konfigurasi ---
         const priorityWeights = { 'Tinggi': 3, 'Sedang': 2, 'Rendah': 1 };
         const priorityBadgeColors = {
             'Tinggi': 'bg-red-100 text-red-700 border-red-200',
@@ -290,6 +394,8 @@
             'Sedang': 'text-amber-600',
             'Rendah': 'text-slate-500'
         };
+
+        const todayStringId = new Date().toLocaleDateString('en-CA'); // Format YYYY-MM-DD standar perbandingan
 
         // --- DOM Elements ---
         const projectForm = document.getElementById('project-form');
@@ -313,7 +419,41 @@
         const subtaskForm = document.getElementById('subtask-form');
         const subtaskInput = document.getElementById('subtask-input');
 
-        // --- Toast & Custom Modal Logic ---
+        // Tab DOM
+        const tabProjects = document.getElementById('tab-projects');
+        const tabJournals = document.getElementById('tab-journals');
+        const tabRoutines = document.getElementById('tab-routines');
+        const projectView = document.getElementById('project-view');
+        const journalView = document.getElementById('journal-view');
+        const routineView = document.getElementById('routine-view');
+
+        // Journal DOM
+        const journalForm = document.getElementById('journal-form');
+        const journalTypeInput = document.getElementById('journal-type');
+        const journalContentInput = document.getElementById('journal-content');
+        const journalGrid = document.getElementById('journal-grid');
+        const journalEmptyState = document.getElementById('journal-empty-state');
+        const formDateDisplay = document.getElementById('form-date-display');
+
+        // Routine DOM
+        const routineForm = document.getElementById('routine-form');
+        const routineInput = document.getElementById('routine-input');
+        const routineList = document.getElementById('routine-list');
+        const routineEmptyState = document.getElementById('routine-empty-state');
+        const routineTodayDate = document.getElementById('routine-today-date');
+        const routineProgressText = document.getElementById('routine-progress-text');
+        const trackerDaysHeader = document.getElementById('tracker-days-header');
+        const trackerHeaderContainer = document.getElementById('routine-tracker-header');
+
+        // State Kalender Jurnal
+        let navMonth = new Date().getMonth();
+        let navYear = new Date().getFullYear();
+        let selectedJournalDate = todayStringId; 
+
+        // Set Text Date for Routines
+        routineTodayDate.textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+
+        // --- Toast & Modals Logic ---
         function showToast(message, type = 'error') {
             const toast = document.createElement('div');
             toast.className = `px-4 py-3 rounded-xl shadow-lg flex items-center gap-3 transform translate-y-10 opacity-0 transition-all duration-300 pointer-events-auto ${type === 'error' ? 'bg-red-50 border-l-4 border-red-500 text-red-800' : 'bg-green-50 border-l-4 border-green-500 text-green-800'}`;
@@ -338,7 +478,6 @@
                 confirmModal.querySelector('div').classList.add('translate-y-0', 'scale-100');
             }, 10);
         };
-
         window.closeConfirm = function() {
             const confirmModal = document.getElementById('confirm-modal');
             confirmModal.classList.add('opacity-0');
@@ -346,7 +485,6 @@
             confirmModal.querySelector('div').classList.add('translate-y-4', 'scale-95');
             setTimeout(() => { confirmModal.classList.add('invisible'); confirmAction = null; }, 300);
         };
-
         document.getElementById('confirm-yes-btn').addEventListener('click', () => {
             if (confirmAction) confirmAction();
             window.closeConfirm();
@@ -368,7 +506,6 @@
                 input.select();
             }, 10);
         };
-
         window.closePrompt = function() {
             const promptModal = document.getElementById('prompt-modal');
             promptModal.classList.add('opacity-0');
@@ -376,12 +513,10 @@
             promptModal.querySelector('div').classList.add('translate-y-4', 'scale-95');
             setTimeout(() => { promptModal.classList.add('invisible'); promptAction = null; }, 300);
         };
-
         document.getElementById('prompt-save-btn').addEventListener('click', () => {
             if (promptAction) promptAction(document.getElementById('prompt-input').value);
             window.closePrompt();
         });
-
         document.getElementById('prompt-input').addEventListener('keypress', (e) => {
             if (e.key === 'Enter') {
                 if (promptAction) promptAction(e.target.value);
@@ -389,113 +524,357 @@
             }
         });
 
-        // --- Core Formatting & Computations ---
+        // --- Core Formatting ---
         function escapeHTML(str) {
             if (str === null || str === undefined) return '';
-            return String(str).replace(/[&<>'"]/g, 
-                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
-            );
+            return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
         }
 
+        // --- TAB NAVIGATION ---
+        window.switchTab = function(tabName) {
+            currentTab = tabName;
+            const tabs = {
+                'projects': { btn: tabProjects, view: projectView },
+                'routines': { btn: tabRoutines, view: routineView },
+                'journals': { btn: tabJournals, view: journalView }
+            };
+
+            for (const [key, els] of Object.entries(tabs)) {
+                if (key === tabName) {
+                    els.view.classList.remove('hidden');
+                    els.view.classList.add('block');
+                    els.btn.className = "pb-3 border-b-2 border-burgundy-600 font-bold text-burgundy-800 transition-colors flex items-center gap-2 px-2";
+                } else {
+                    els.view.classList.remove('block');
+                    els.view.classList.add('hidden');
+                    els.btn.className = "pb-3 border-b-2 border-transparent font-medium text-slate-500 hover:text-slate-800 transition-colors flex items-center gap-2 px-2";
+                }
+            }
+
+            if (tabName === 'journals') { renderCalendar(); renderJournals(); }
+            if (tabName === 'routines') { renderRoutines(); }
+        };
+
+        // ==================== RUTINITAS HARIAN LOGIC (Streak Tracker) ====================
+        
+        // Buat array 1 minggu ini (Senin - Minggu)
+        const currentWeek = Array.from({length: 7}, (_, i) => {
+            const d = new Date();
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Mulai dari Senin
+            d.setDate(diff + i);
+            return d;
+        });
+        const daysLabels = ['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'];
+
+        function renderRoutines() {
+            routineList.innerHTML = '';
+            
+            if (routines.length === 0) {
+                routineEmptyState.classList.remove('hidden');
+                routineEmptyState.classList.add('flex');
+                trackerHeaderContainer.classList.add('hidden');
+                trackerHeaderContainer.classList.remove('sm:flex');
+                routineProgressText.textContent = "0/0";
+                return;
+            }
+
+            routineEmptyState.classList.add('hidden');
+            routineEmptyState.classList.remove('flex');
+            trackerHeaderContainer.classList.remove('hidden');
+            trackerHeaderContainer.classList.add('sm:flex');
+            
+            // Render Header Hari untuk Streak Tracker
+            trackerDaysHeader.innerHTML = currentWeek.map((d) => {
+                const isToday = d.toLocaleDateString('en-CA') === todayStringId;
+                return `<div class="w-8 text-[10px] font-bold ${isToday ? 'text-burgundy-600' : 'text-slate-400'} uppercase tracking-tighter" title="${d.toLocaleDateString('id-ID')}">${daysLabels[d.getDay()]}</div>`;
+            }).join('');
+            
+            let completedCount = 0;
+
+            routines.forEach(routine => {
+                const completedDates = routine.completedDates || [];
+                const isCompletedToday = completedDates.includes(todayStringId);
+                
+                if (isCompletedToday) completedCount++;
+
+                // Buat kotak indikator untuk 1 minggu ini
+                let streakHtml = currentWeek.map((dateObj) => {
+                    const dateStr = dateObj.toLocaleDateString('en-CA');
+                    const done = completedDates.includes(dateStr);
+                    const isToday = dateStr === todayStringId;
+                    const isFuture = dateStr > todayStringId;
+                    
+                    let bgClass = '';
+                    let content = '';
+
+                    if (isFuture) {
+                        bgClass = 'bg-slate-50 border border-slate-100 opacity-50';
+                        content = '<div class="w-1.5 h-1.5 rounded-full bg-slate-200"></div>';
+                    } else if (done) {
+                        bgClass = 'bg-green-400 text-green-800 shadow-sm';
+                        content = '<i class="ph-bold ph-check text-sm"></i>';
+                    } else {
+                        bgClass = 'bg-slate-100 text-slate-300';
+                        content = '<div class="w-1.5 h-1.5 rounded-full bg-slate-300"></div>';
+                    }
+                    
+                    let borderClass = isToday ? 'ring-2 ring-offset-1 ring-burgundy-200' : '';
+                    
+                    return `<div class="w-8 h-8 rounded-lg ${bgClass} ${borderClass} flex items-center justify-center transition-all" title="${dateObj.toLocaleDateString('id-ID')}">
+                                ${content}
+                            </div>`;
+                }).join('');
+
+                const li = document.createElement('li');
+                li.className = `p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between group transition-colors hover:bg-slate-50 gap-4 sm:gap-6`;
+                
+                li.innerHTML = `
+                    <div class="flex items-center gap-4 flex-1 cursor-pointer" onclick="toggleRoutine(${routine.id})">
+                        <div class="w-6 h-6 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-colors ${isCompletedToday ? 'border-green-500 bg-green-500 text-white shadow-sm' : 'border-slate-300 group-hover:border-burgundy-500 text-transparent bg-white'}">
+                            <i class="ph-bold ph-check text-sm"></i>
+                        </div>
+                        <span class="text-base font-medium select-none ${isCompletedToday ? 'text-slate-400 line-through' : 'text-slate-700'}">${escapeHTML(routine.text)}</span>
+                    </div>
+                    
+                    <div class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pl-10 sm:pl-0">
+                        <!-- 7-Day Tracker -->
+                        <div class="flex gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
+                            ${streakHtml}
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex items-center gap-1 sm:opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onclick="editRoutine(${routine.id})" class="text-slate-400 hover:text-burgundy-600 p-1.5 sm:p-2 rounded-lg hover:bg-burgundy-50 transition-colors" title="Ubah Text">
+                                <i class="ph-bold ph-pencil-simple text-lg"></i>
+                            </button>
+                            <button onclick="deleteRoutine(${routine.id})" class="text-slate-300 hover:text-red-600 p-1.5 sm:p-2 rounded-lg hover:bg-red-50 transition-colors" title="Hapus Rutinitas">
+                                <i class="ph-bold ph-trash text-lg"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                routineList.appendChild(li);
+            });
+
+            routineProgressText.textContent = `${completedCount}/${routines.length}`;
+        }
+
+        routineForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!user) return;
+            const text = routineInput.value.trim();
+            if (text) {
+                const newRoutine = {
+                    id: Date.now(),
+                    text: text,
+                    completedDates: [] 
+                };
+                saveData('routines', newRoutine);
+                routineInput.value = '';
+            }
+        });
+
+        window.toggleRoutine = function(id) {
+            if (!user) return;
+            const routine = routines.find(r => r.id === id);
+            if (routine) {
+                if (!routine.completedDates) routine.completedDates = [];
+                const idx = routine.completedDates.indexOf(todayStringId);
+                
+                if (idx > -1) {
+                    routine.completedDates.splice(idx, 1); 
+                } else {
+                    routine.completedDates.push(todayStringId); 
+                }
+                saveData('routines', routine);
+            }
+        };
+
+        window.editRoutine = function(id) {
+            event.stopPropagation();
+            const routine = routines.find(r => r.id === id);
+            if(routine) {
+                window.showPrompt("Ubah nama rutinitas:", routine.text, (newName) => {
+                    if(newName && newName.trim() !== "") {
+                        routine.text = newName.trim();
+                        saveData('routines', routine);
+                    }
+                });
+            }
+        }
+
+        window.deleteRoutine = function(id) {
+            event.stopPropagation();
+            window.showConfirm('Apakah Baginda yakin ingin menghapus rutinitas ini selamanya?', () => {
+                deleteData('routines', id);
+            });
+        };
+
+
+        // ==================== JURNAL LOGIC ====================
+        window.changeMonth = function(dir) {
+            navMonth += dir;
+            if (navMonth > 11) { navMonth = 0; navYear++; }
+            else if (navMonth < 0) { navMonth = 11; navYear--; }
+            renderCalendar();
+        };
+
+        window.selectDate = function(dateStr) {
+            selectedJournalDate = dateStr;
+            renderCalendar();
+            renderJournals();
+        };
+
+        function renderCalendar() {
+            const calendarGrid = document.getElementById('calendar-grid');
+            const monthYearText = document.getElementById('calendar-month-year');
+            const monthNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+            
+            monthYearText.textContent = `${monthNames[navMonth]} ${navYear}`;
+            calendarGrid.innerHTML = '';
+            
+            const firstDay = new Date(navYear, navMonth, 1).getDay();
+            const daysInMonth = new Date(navYear, navMonth + 1, 0).getDate();
+            
+            for (let i = 0; i < firstDay; i++) { calendarGrid.innerHTML += `<div class="aspect-square"></div>`; }
+            
+            for (let i = 1; i <= daysInMonth; i++) {
+                const m = String(navMonth + 1).padStart(2, '0');
+                const d = String(i).padStart(2, '0');
+                const dateStr = `${navYear}-${m}-${d}`;
+                
+                const isSelected = dateStr === selectedJournalDate;
+                const isToday = dateStr === todayStringId;
+                const hasJournal = journals.some(j => j.date === dateStr);
+                
+                let dotHtml = '';
+                if(hasJournal) dotHtml = `<div class="w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-burgundy-500'} absolute bottom-1.5"></div>`;
+
+                let classes = "relative aspect-square flex flex-col items-center justify-center rounded-xl cursor-pointer transition-all text-sm font-semibold border border-transparent ";
+                if (isSelected) classes += "bg-burgundy-600 text-white shadow-md shadow-burgundy-600/30 ";
+                else {
+                    classes += "hover:bg-burgundy-50 hover:text-burgundy-800 text-slate-600 ";
+                    if (isToday) classes += "border-burgundy-200 bg-burgundy-50/50 text-burgundy-700 ";
+                }
+                
+                calendarGrid.innerHTML += `<div onclick="selectDate('${dateStr}')" class="${classes}"><span>${i}</span>${dotHtml}</div>`;
+            }
+        }
+
+        const journalStyles = {
+            'Syukur': { icon: 'ph-hands-praying', color: 'text-teal-600', bg: 'bg-teal-50', border: 'border-teal-200' },
+            'Pencapaian': { icon: 'ph-trophy', color: 'text-yellow-600', bg: 'bg-yellow-50', border: 'border-yellow-200' },
+            'Pelajaran': { icon: 'ph-lightbulb', color: 'text-amber-600', bg: 'bg-amber-50', border: 'border-amber-200' },
+            'Emosi': { icon: 'ph-cloud-rain', color: 'text-blue-600', bg: 'bg-blue-50', border: 'border-blue-200' },
+            'Ide': { icon: 'ph-sparkle', color: 'text-purple-600', bg: 'bg-purple-50', border: 'border-purple-200' },
+            'Bersyukur': { icon: 'ph-hands-praying', color: 'text-teal-600', bg: 'bg-teal-50', border: 'border-teal-200' },
+            'Kehidupan': { icon: 'ph-coffee', color: 'text-indigo-600', bg: 'bg-indigo-50', border: 'border-indigo-200' }
+        };
+
+        function renderJournals() {
+            if(formDateDisplay) {
+                const [y, m, d] = selectedJournalDate.split('-');
+                formDateDisplay.textContent = new Date(y, m - 1, d).toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+            }
+
+            journalGrid.innerHTML = '';
+            const dailyJournals = journals.filter(j => j.date === selectedJournalDate);
+
+            if (dailyJournals.length === 0) {
+                journalEmptyState.classList.remove('hidden'); journalEmptyState.classList.add('flex');
+            } else {
+                journalEmptyState.classList.add('hidden'); journalEmptyState.classList.remove('flex');
+                
+                dailyJournals.forEach(j => {
+                    const style = journalStyles[j.type] || journalStyles['Kehidupan'];
+                    const card = document.createElement('div');
+                    card.className = `group bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-all relative overflow-hidden`;
+                    card.innerHTML = `
+                        <div class="absolute top-0 left-0 w-1.5 h-full ${style.bg} border-r ${style.border}"></div>
+                        <div class="pl-3">
+                            <div class="flex justify-between items-start mb-4">
+                                <div class="flex items-center gap-3">
+                                    <div class="p-2.5 rounded-xl ${style.bg} border ${style.border} ${style.color}"><i class="ph-duotone ${style.icon} text-xl"></i></div>
+                                    <h4 class="font-bold text-sm tracking-wide uppercase text-slate-800">${escapeHTML(j.type)}</h4>
+                                </div>
+                                <button onclick="deleteJournal(${j.id})" class="text-slate-300 hover:text-red-600 hover:bg-red-50 p-2 rounded-xl transition-all opacity-0 group-hover:opacity-100 focus:opacity-100" title="Hapus Jurnal"><i class="ph-bold ph-trash text-lg"></i></button>
+                            </div>
+                            <p class="text-slate-700 leading-relaxed text-sm whitespace-pre-wrap">${escapeHTML(j.content)}</p>
+                        </div>
+                    `;
+                    journalGrid.appendChild(card);
+                });
+            }
+        }
+
+        journalForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (!user) return;
+            const content = journalContentInput.value.trim();
+            if (content) {
+                saveData('journals', { id: Date.now(), date: selectedJournalDate, type: journalTypeInput.value, content: content });
+                journalContentInput.value = '';
+            }
+        });
+
+        window.deleteJournal = function(id) {
+            window.showConfirm('Apakah Baginda yakin ingin menghapus catatan jurnal ini?', () => deleteData('journals', id));
+        };
+
+
+        // ==================== PROYEK LOGIC ====================
+        // (Tetap Mempertahankan Logika Lama)
         function calculateProgress(subtasks) {
             if (!subtasks || subtasks.length === 0) return 0;
             const completed = subtasks.filter(s => {
-                if (s.subSubtasks && s.subSubtasks.length > 0) {
-                    return s.subSubtasks.every(ss => ss.completed);
-                }
+                if (s.subSubtasks && s.subSubtasks.length > 0) return s.subSubtasks.every(ss => ss.completed);
                 return s.completed;
             }).length;
             return Math.round((completed / subtasks.length) * 100);
         }
-
         function formatDate(dateString) {
             if (!dateString) return '';
-            const options = { day: 'numeric', month: 'short', year: 'numeric' };
-            return new Date(dateString).toLocaleDateString('id-ID', options);
+            return new Date(dateString).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
         }
-
         function getStatusTextColor(status) {
-            switch(status) {
-                case 'Plan': return 'text-slate-500';
-                case 'Execute': return 'text-blue-600';
-                case 'Finish': return 'text-green-600';
-                default: return 'text-slate-500';
-            }
+            switch(status) { case 'Plan': return 'text-slate-500'; case 'Execute': return 'text-blue-600'; case 'Finish': return 'text-green-600'; default: return 'text-slate-500'; }
         }
-
         function setModalPriorityColor(priority) {
             modalProjectPriority.className = `bg-transparent outline-none cursor-pointer font-bold tracking-wide uppercase text-xs ${priorityTextColors[priority] || 'text-slate-700'}`;
         }
-
-        function calculateProjectDatesFromSubtasks(subtasks) {
-            if (!subtasks || subtasks.length === 0) return { start: null, due: null };
-            let minStart = null;
-            let maxDue = null;
-            subtasks.forEach(sub => {
-                if (sub.startDate) {
-                    if (!minStart || new Date(sub.startDate) < new Date(minStart)) minStart = sub.startDate;
-                }
-                if (sub.dueDate) {
-                    if (!maxDue || new Date(sub.dueDate) > new Date(maxDue)) maxDue = sub.dueDate;
-                }
-            });
-            return { start: minStart, due: maxDue };
-        }
-
         function getFinalProjectDates(task) {
-            const autoDates = calculateProjectDatesFromSubtasks(task.subtasks);
+            if (!task.subtasks || task.subtasks.length === 0) return { start: task.startDate || null, due: task.dueDate || null, isAuto: false };
+            let minStart = null, maxDue = null;
+            task.subtasks.forEach(sub => {
+                if (sub.startDate && (!minStart || new Date(sub.startDate) < new Date(minStart))) minStart = sub.startDate;
+                if (sub.dueDate && (!maxDue || new Date(sub.dueDate) > new Date(maxDue))) maxDue = sub.dueDate;
+            });
             return {
-                start: task.startDate || autoDates.start,
-                due: task.dueDate || autoDates.due,
-                isAuto: (!task.startDate && !task.dueDate && (autoDates.start || autoDates.due))
+                start: task.startDate || minStart, due: task.dueDate || maxDue,
+                isAuto: (!task.startDate && !task.dueDate && (minStart || maxDue))
             };
         }
-
         function updateHeaderStats() {
             if(!tasks) return;
             const active = tasks.filter(t => calculateProgress(t.subtasks || []) < 100).length;
             headerStats.textContent = `${active} Proyek Aktif`;
         }
 
-        // --- Rendering UI ---
-        // Penambahan Debounce agar pencarian tidak memberatkan browser
         let searchTimeout;
-        window.handleSearch = function(val) {
-            clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => {
-                currentSearch = val.toLowerCase();
-                renderProjects();
-            }, 300); // Tunggu 300ms setelah selesai mengetik baru di-render
-        };
-
-        window.handleFilter = function(val) {
-            currentFilter = val;
-            renderProjects();
-        };
+        window.handleSearch = function(val) { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { currentSearch = val.toLowerCase(); renderProjects(); }, 300); };
+        window.handleFilter = function(val) { currentFilter = val; renderProjects(); };
 
         function renderProjects() {
             projectGrid.innerHTML = '';
-            
             const filteredTasks = tasks.filter(t => {
-                const matchSearch = t.text.toLowerCase().includes(currentSearch);
-                const matchFilter = currentFilter === 'All' || t.status === currentFilter;
-                return matchSearch && matchFilter;
+                return t.text.toLowerCase().includes(currentSearch) && (currentFilter === 'All' || t.status === currentFilter);
             });
 
             if (filteredTasks.length === 0) {
-                emptyState.classList.remove('hidden');
-                emptyState.classList.add('flex');
-                if (tasks.length > 0) {
-                    document.getElementById('empty-title').textContent = 'Pencarian tidak ditemukan';
-                    document.getElementById('empty-desc').textContent = 'Coba kata kunci atau filter status lain.';
-                } else {
-                    document.getElementById('empty-title').textContent = 'Belum ada proyek';
-                    document.getElementById('empty-desc').textContent = 'Silakan buat proyek baru untuk memulai.';
-                }
+                emptyState.classList.remove('hidden'); emptyState.classList.add('flex');
             } else {
-                emptyState.classList.add('hidden');
-                emptyState.classList.remove('flex');
-                
+                emptyState.classList.add('hidden'); emptyState.classList.remove('flex');
                 filteredTasks.forEach(task => {
                     if (!task.subtasks) task.subtasks = [];
                     if (!task.status) task.status = 'Plan';
@@ -503,16 +882,12 @@
                     
                     const progress = calculateProgress(task.subtasks);
                     const isFullyCompleted = task.subtasks.length > 0 && progress === 100;
-                    const subtaskCount = task.subtasks.length;
                     const completedCount = task.subtasks.filter(s => s.completed).length;
-
                     const finalDates = getFinalProjectDates(task);
+                    
                     let dateDisplay = 'Jadwal belum diatur';
-                    if (finalDates.start && finalDates.due) {
-                        dateDisplay = `${formatDate(finalDates.start)} - ${formatDate(finalDates.due)}`;
-                    } else if (finalDates.start || finalDates.due) {
-                        dateDisplay = 'Jadwal parsial';
-                    }
+                    if (finalDates.start && finalDates.due) dateDisplay = `${formatDate(finalDates.start)} - ${formatDate(finalDates.due)}`;
+                    else if (finalDates.start || finalDates.due) dateDisplay = 'Jadwal parsial';
 
                     const card = document.createElement('div');
                     card.className = `group bg-white rounded-2xl p-6 border shadow-sm hover:shadow-lg transition-all cursor-pointer flex flex-col ${isFullyCompleted ? 'border-green-200 bg-green-50/10' : 'border-slate-200 hover:border-burgundy-300'}`;
@@ -522,37 +897,23 @@
                         <div class="flex justify-between items-start mb-3 gap-3">
                             <h3 class="font-bold text-xl text-slate-800 leading-tight group-hover:text-burgundy-800 transition-colors line-clamp-2">${escapeHTML(task.text)}</h3>
                             <div class="flex items-center gap-1 flex-shrink-0">
-                                <button onclick="editProjectGrid(event, ${task.id})" class="text-slate-300 hover:text-burgundy-600 hover:bg-burgundy-50 p-1.5 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100" title="Ubah Nama">
-                                    <i class="ph-bold ph-pencil-simple text-lg"></i>
-                                </button>
-                                <button onclick="deleteProjectFromGrid(event, ${task.id})" class="text-slate-300 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100" title="Hapus Proyek">
-                                    <i class="ph-bold ph-trash text-lg"></i>
-                                </button>
+                                <button onclick="editProjectGrid(event, ${task.id})" class="text-slate-300 hover:text-burgundy-600 hover:bg-burgundy-50 p-1.5 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"><i class="ph-bold ph-pencil-simple text-lg"></i></button>
+                                <button onclick="deleteProjectFromGrid(event, ${task.id})" class="text-slate-300 hover:text-red-600 hover:bg-red-50 p-1.5 rounded-lg transition-colors opacity-0 group-hover:opacity-100 focus:opacity-100"><i class="ph-bold ph-trash text-lg"></i></button>
                             </div>
                         </div>
-                        
                         <div class="flex justify-between items-center mb-6">
                             <div class="flex items-center gap-2 text-sm font-medium ${finalDates.start && finalDates.due ? 'text-burgundy-700' : 'text-slate-400'}">
-                                <i class="${finalDates.start && finalDates.due ? 'ph-duotone ph-calendar' : 'ph-duotone ph-calendar-blank'} text-lg"></i>
-                                <span>${dateDisplay}</span>
+                                <i class="${finalDates.start && finalDates.due ? 'ph-duotone ph-calendar' : 'ph-duotone ph-calendar-blank'} text-lg"></i><span>${dateDisplay}</span>
                                 ${finalDates.isAuto ? '<span class="text-[10px] bg-slate-100 text-slate-500 px-1.5 py-0.5 rounded uppercase tracking-wider">Auto</span>' : ''}
                             </div>
                             <div class="flex gap-2">
-                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-md border whitespace-nowrap uppercase tracking-wider ${priorityBadgeColors[task.priority]}">
-                                    ${task.priority}
-                                </span>
-                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-md border whitespace-nowrap uppercase tracking-wider ${getStatusTextColor(task.status)} border-current opacity-70">
-                                    ${task.status}
-                                </span>
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-md border whitespace-nowrap uppercase tracking-wider ${priorityBadgeColors[task.priority]}">${task.priority}</span>
+                                <span class="text-[10px] font-bold px-2.5 py-1 rounded-md border whitespace-nowrap uppercase tracking-wider ${getStatusTextColor(task.status)} border-current opacity-70">${task.status}</span>
                             </div>
                         </div>
-                        
                         <div class="mt-auto pt-4 border-t border-slate-50">
                             <div class="flex justify-between items-end mb-2.5">
-                                <span class="text-xs font-semibold text-slate-500 flex items-center gap-1.5">
-                                    <i class="ph-fill ph-check-circle text-slate-400 text-sm"></i>
-                                    ${completedCount} / ${subtaskCount} tugas
-                                </span>
+                                <span class="text-xs font-semibold text-slate-500 flex items-center gap-1.5"><i class="ph-fill ph-check-circle text-slate-400 text-sm"></i>${completedCount} / ${task.subtasks.length} tugas</span>
                                 <span class="text-sm font-bold ${isFullyCompleted ? 'text-green-600' : 'text-burgundy-700'}">${progress}%</span>
                             </div>
                             <div class="w-full h-2 bg-slate-100 rounded-full overflow-hidden">
@@ -577,23 +938,14 @@
             modalProgressText.textContent = `${progress}%`;
 
             modalSubtaskList.innerHTML = '';
-            
             if (!project.subtasks || project.subtasks.length === 0) {
-                modalSubtaskList.innerHTML = `
-                    <div class="text-center py-10 text-slate-400 text-sm bg-white rounded-2xl border border-dashed border-slate-200">
-                        <i class="ph-duotone ph-list-plus text-4xl mb-2 text-slate-300"></i><br>
-                        Belum ada detail pekerjaan. Tambahkan di bawah.
-                    </div>
-                `;
+                modalSubtaskList.innerHTML = `<div class="text-center py-10 text-slate-400 text-sm bg-white rounded-2xl border border-dashed border-slate-200"><i class="ph-duotone ph-list-plus text-4xl mb-2 text-slate-300"></i><br>Belum ada detail pekerjaan. Tambahkan di bawah.</div>`;
                 return;
             }
 
-            // Urutkan sub-pekerjaan berdasarkan prioritas tertinggi terlebih dahulu
             const sortedSubtasks = [...project.subtasks].sort((a, b) => {
-                const wA = priorityWeights[a.priority || 'Sedang'];
-                const wB = priorityWeights[b.priority || 'Sedang'];
-                if (wA !== wB) return wB - wA; // Tinggi didahulukan
-                return a.id - b.id; // Sisanya diurutkan berdasarkan waktu pembuatan
+                const wA = priorityWeights[a.priority || 'Sedang'], wB = priorityWeights[b.priority || 'Sedang'];
+                if (wA !== wB) return wB - wA; return a.id - b.id;
             });
 
             sortedSubtasks.forEach(sub => {
@@ -601,10 +953,7 @@
                 if (sub.expanded === undefined) sub.expanded = false;
                 if (!sub.status) sub.status = 'Plan'; 
                 if (!sub.priority) sub.priority = 'Sedang';
-
-                if (sub.subSubtasks.length > 0) {
-                    sub.completed = sub.subSubtasks.every(ss => ss.completed);
-                }
+                if (sub.subSubtasks.length > 0) sub.completed = sub.subSubtasks.every(ss => ss.completed);
 
                 const li = document.createElement('li');
                 li.className = `group/main flex flex-col p-4 rounded-2xl border ${sub.completed ? 'bg-slate-50 border-transparent shadow-none opacity-80' : 'bg-white border-slate-200 shadow-sm hover:border-burgundy-300'} transition-all`;
@@ -612,58 +961,36 @@
                 let html = `
                     <div class="flex items-center justify-between mb-2">
                         <div class="flex items-center gap-3 flex-1">
-                            <button onclick="toggleSubtask(${sub.id})" class="flex-shrink-0 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${sub.completed ? 'border-green-500 bg-green-500 text-white' : 'border-slate-300 hover:border-burgundy-500 text-transparent'}">
-                                <i class="ph-bold ph-check text-sm"></i>
-                            </button>
-                            <span class="${sub.completed ? 'text-slate-400 line-through' : 'text-slate-800 font-semibold'} select-none text-base break-words flex-1">
-                                ${escapeHTML(sub.text)}
-                            </span>
+                            <button onclick="toggleSubtask(${sub.id})" class="flex-shrink-0 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-colors ${sub.completed ? 'border-green-500 bg-green-500 text-white' : 'border-slate-300 hover:border-burgundy-500 text-transparent'}"><i class="ph-bold ph-check text-sm"></i></button>
+                            <span class="${sub.completed ? 'text-slate-400 line-through' : 'text-slate-800 font-semibold'} select-none text-base break-words flex-1">${escapeHTML(sub.text)}</span>
                         </div>
                         <div class="flex items-center gap-1 opacity-0 group-hover/main:opacity-100 focus-within:opacity-100 transition-opacity">
-                            <button onclick="editSubtask(${sub.id})" class="p-2 text-slate-400 hover:text-burgundy-700 hover:bg-burgundy-50 rounded-lg transition-colors" title="Ubah Nama Teks">
-                                <i class="ph-bold ph-pencil-simple text-lg"></i>
-                            </button>
-                            <button onclick="toggleExpandSubtask(${sub.id})" class="p-2 text-slate-400 hover:text-burgundy-700 hover:bg-burgundy-50 rounded-lg transition-colors flex items-center gap-1" title="Buka Detail dari Detail">
-                                <span class="text-xs font-bold">${sub.subSubtasks.length > 0 ? sub.subSubtasks.length : ''}</span>
-                                <i class="ph-bold ph-caret-${sub.expanded ? 'up' : 'down'} text-lg"></i>
-                            </button>
-                            <button onclick="deleteSubtask(${sub.id})" class="p-2 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg transition-all focus:opacity-100" title="Hapus Detail Pekerjaan">
-                                <i class="ph-bold ph-trash text-lg"></i>
-                            </button>
+                            <button onclick="editSubtask(${sub.id})" class="p-2 text-slate-400 hover:text-burgundy-700 hover:bg-burgundy-50 rounded-lg"><i class="ph-bold ph-pencil-simple text-lg"></i></button>
+                            <button onclick="toggleExpandSubtask(${sub.id})" class="p-2 text-slate-400 hover:text-burgundy-700 hover:bg-burgundy-50 rounded-lg flex items-center gap-1"><span class="text-xs font-bold">${sub.subSubtasks.length > 0 ? sub.subSubtasks.length : ''}</span><i class="ph-bold ph-caret-${sub.expanded ? 'up' : 'down'} text-lg"></i></button>
+                            <button onclick="deleteSubtask(${sub.id})" class="p-2 text-slate-300 hover:text-red-600 hover:bg-red-50 rounded-lg"><i class="ph-bold ph-trash text-lg"></i></button>
                         </div>
                     </div>
-                    
                     <div class="ml-9 flex flex-wrap items-center gap-4 text-xs font-medium text-slate-500 ${sub.completed ? 'opacity-60' : ''}">
-                        <div class="flex items-center gap-1.5 border-b border-transparent hover:border-slate-300 transition-colors pb-0.5" title="Prioritas">
+                        <div class="flex items-center gap-1.5 border-b border-transparent hover:border-slate-300 pb-0.5">
                             <i class="ph-duotone ph-warning-circle text-slate-400"></i>
                             <select onchange="updateSubtaskPriority(${sub.id}, this.value)" class="bg-transparent outline-none cursor-pointer font-bold uppercase tracking-wider ${priorityTextColors[sub.priority]}">
-                                <option value="Tinggi" ${sub.priority === 'Tinggi' ? 'selected' : ''} class="text-slate-700 font-medium">TINGGI</option>
-                                <option value="Sedang" ${sub.priority === 'Sedang' ? 'selected' : ''} class="text-slate-700 font-medium">SEDANG</option>
-                                <option value="Rendah" ${sub.priority === 'Rendah' ? 'selected' : ''} class="text-slate-700 font-medium">RENDAH</option>
+                                <option value="Tinggi" ${sub.priority === 'Tinggi' ? 'selected' : ''} class="text-slate-700 font-medium">TINGGI</option><option value="Sedang" ${sub.priority === 'Sedang' ? 'selected' : ''} class="text-slate-700 font-medium">SEDANG</option><option value="Rendah" ${sub.priority === 'Rendah' ? 'selected' : ''} class="text-slate-700 font-medium">RENDAH</option>
                             </select>
                         </div>
                         <span class="text-slate-300 hidden sm:inline">|</span>
-                        <div class="flex items-center gap-1.5 border-b border-transparent hover:border-slate-300 transition-colors pb-0.5" title="Status">
+                        <div class="flex items-center gap-1.5 border-b border-transparent hover:border-slate-300 pb-0.5">
                             <i class="ph-duotone ph-flag text-slate-400"></i>
                             <select onchange="updateSubtaskStatus(${sub.id}, this.value)" class="bg-transparent outline-none cursor-pointer font-bold uppercase tracking-wider ${getStatusTextColor(sub.status)}">
-                                <option value="Plan" ${sub.status === 'Plan' ? 'selected' : ''} class="text-slate-700 font-medium">PLAN</option>
-                                <option value="Execute" ${sub.status === 'Execute' ? 'selected' : ''} class="text-slate-700 font-medium">EXECUTE</option>
-                                <option value="Finish" ${sub.status === 'Finish' ? 'selected' : ''} class="text-slate-700 font-medium">FINISH</option>
+                                <option value="Plan" ${sub.status === 'Plan' ? 'selected' : ''} class="text-slate-700 font-medium">PLAN</option><option value="Execute" ${sub.status === 'Execute' ? 'selected' : ''} class="text-slate-700 font-medium">EXECUTE</option><option value="Finish" ${sub.status === 'Finish' ? 'selected' : ''} class="text-slate-700 font-medium">FINISH</option>
                             </select>
                         </div>
                         <span class="text-slate-300 hidden sm:inline">|</span>
-                        <div class="date-input-wrapper flex items-center gap-1.5 border-b border-transparent hover:border-slate-300 transition-colors pb-0.5">
-                            <i class="ph-duotone ph-calendar-plus text-slate-400"></i>
-                            <span class="text-slate-400 hidden sm:inline">Mulai:</span>
-                            <input type="date" value="${sub.startDate}" onchange="updateSubtaskDate(${sub.id}, 'startDate', this.value)" class="bg-transparent outline-none cursor-pointer text-slate-600 w-24 sm:w-auto" title="Tanggal Mulai">
-                            ${!sub.startDate ? '<span class="absolute right-0 pointer-events-none text-slate-300 italic">Set tgl...</span>' : ''}
+                        <div class="date-input-wrapper flex items-center gap-1.5 border-b border-transparent hover:border-slate-300 pb-0.5">
+                            <i class="ph-duotone ph-calendar-plus text-slate-400"></i><input type="date" value="${sub.startDate}" onchange="updateSubtaskDate(${sub.id}, 'startDate', this.value)" class="bg-transparent outline-none cursor-pointer text-slate-600 w-24 sm:w-auto">
                         </div>
                         <span class="text-slate-300 hidden sm:inline">|</span>
-                        <div class="date-input-wrapper flex items-center gap-1.5 border-b border-transparent hover:border-slate-300 transition-colors pb-0.5">
-                            <i class="ph-duotone ph-calendar-check text-slate-400"></i>
-                            <span class="text-slate-400 hidden sm:inline">Tenggat:</span>
-                            <input type="date" value="${sub.dueDate}" onchange="updateSubtaskDate(${sub.id}, 'dueDate', this.value)" class="bg-transparent outline-none cursor-pointer text-slate-600 w-24 sm:w-auto" title="Tenggat Waktu">
-                            ${!sub.dueDate ? '<span class="absolute right-0 pointer-events-none text-slate-300 italic">Set tgl...</span>' : ''}
+                        <div class="date-input-wrapper flex items-center gap-1.5 border-b border-transparent hover:border-slate-300 pb-0.5">
+                            <i class="ph-duotone ph-calendar-check text-slate-400"></i><input type="date" value="${sub.dueDate}" onchange="updateSubtaskDate(${sub.id}, 'dueDate', this.value)" class="bg-transparent outline-none cursor-pointer text-slate-600 w-24 sm:w-auto">
                         </div>
                     </div>
                 `;
@@ -673,485 +1000,137 @@
                         <div class="mt-4 ml-9 pt-3 border-t border-slate-100">
                             <ul class="space-y-2 mb-3">
                                 ${sub.subSubtasks.map(ss => `
-                                    <li class="flex items-center justify-between group/ss py-1 border-b border-transparent hover:border-slate-100 rounded px-2 -mx-2 transition-colors">
+                                    <li class="flex items-center justify-between group/ss py-1 border-b border-transparent hover:border-slate-100 rounded px-2 -mx-2">
                                         <div class="flex items-center gap-2.5 flex-1 cursor-pointer" onclick="toggleSubSubtask(${sub.id}, ${ss.id})">
-                                            <button class="text-lg flex-shrink-0 ${ss.completed ? 'text-green-500' : 'text-slate-300 hover:text-green-500'} transition-colors">
-                                                <i class="${ss.completed ? 'ph-fill ph-check-circle' : 'ph ph-circle'}"></i>
-                                            </button>
-                                            <span class="text-sm font-medium ${ss.completed ? 'text-slate-400 line-through' : 'text-slate-600'} select-none">${escapeHTML(ss.text)}</span>
+                                            <button class="text-lg flex-shrink-0 ${ss.completed ? 'text-green-500' : 'text-slate-300 hover:text-green-500'}"><i class="${ss.completed ? 'ph-fill ph-check-circle' : 'ph ph-circle'}"></i></button>
+                                            <span class="text-sm font-medium ${ss.completed ? 'text-slate-400 line-through' : 'text-slate-600'}">${escapeHTML(ss.text)}</span>
                                         </div>
-                                        <div class="flex opacity-0 group-hover/ss:opacity-100 transition-opacity">
-                                            <button onclick="editSubSubtask(${sub.id}, ${ss.id})" class="text-slate-300 hover:text-burgundy-600 hover:bg-burgundy-50 p-1.5 rounded-md transition-colors" title="Ubah Nama">
-                                                <i class="ph-bold ph-pencil-simple"></i>
-                                            </button>
-                                            <button onclick="deleteSubSubtask(${sub.id}, ${ss.id})" class="text-slate-300 hover:text-red-500 hover:bg-red-50 p-1.5 rounded-md transition-colors" title="Hapus">
-                                                <i class="ph-bold ph-x"></i>
-                                            </button>
+                                        <div class="flex opacity-0 group-hover/ss:opacity-100">
+                                            <button onclick="editSubSubtask(${sub.id}, ${ss.id})" class="text-slate-300 hover:text-burgundy-600 p-1.5"><i class="ph-bold ph-pencil-simple"></i></button>
+                                            <button onclick="deleteSubSubtask(${sub.id}, ${ss.id})" class="text-slate-300 hover:text-red-500 p-1.5"><i class="ph-bold ph-x"></i></button>
                                         </div>
                                     </li>
                                 `).join('')}
                             </ul>
                             <form onsubmit="addSubSubtask(event, ${sub.id})" class="flex gap-2">
-                                <input type="text" id="ss-input-${sub.id}" class="flex-1 px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-burgundy-400 focus:bg-white transition-colors" placeholder="Ketik sub-detail lalu Enter..." autocomplete="off" required>
-                                <button type="submit" class="bg-slate-100 text-slate-600 hover:bg-slate-200 px-4 py-2 rounded-lg text-sm font-semibold transition-colors hidden sm:block">Tambah</button>
+                                <input type="text" id="ss-input-${sub.id}" class="flex-1 px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-burgundy-400 focus:bg-white" placeholder="Ketik sub-detail..." autocomplete="off" required>
+                                <button type="submit" class="bg-slate-100 text-slate-600 px-4 py-2 rounded-lg text-sm font-semibold hidden sm:block">Tambah</button>
                             </form>
                         </div>
                     `;
                 }
-
                 li.innerHTML = html;
                 modalSubtaskList.appendChild(li);
             });
         }
 
-        // --- Firebase CRUD Handlers ---
-
-        window.saveProject = async function(project) {
-            if (!user) return;
-            try {
-                await setDoc(doc(db, 'projects', String(project.id)), project);
-            } catch (e) {
-                console.error("Save Error:", e);
-                showToast("Gagal menyimpan perubahan ke cloud.", "error");
-            }
-        };
-
-        window.deleteProjectData = async function(projectId) {
-            if (!user) return;
-            try {
-                await deleteDoc(doc(db, 'projects', String(projectId)));
-            } catch (e) {
-                console.error("Delete Error:", e);
-                showToast("Gagal menghapus proyek dari cloud.", "error");
-            }
-        };
-
-        // UI toggles
-        window.openModal = function(projectId) {
-            activeProjectId = projectId;
-            const project = tasks.find(t => t.id === projectId);
-            if (!project) return;
-
-            modalTitle.textContent = project.text || 'Tanpa Judul';
-            
-            modalProjectPriority.value = project.priority || 'Sedang';
-            setModalPriorityColor(project.priority || 'Sedang');
-
-            const finalDates = getFinalProjectDates(project);
-            modalProjectStart.value = finalDates.start || '';
-            modalProjectDue.value = finalDates.due || '';
-            
-            if(finalDates.isAuto) {
-                modalDateHint.classList.remove('hidden');
-                modalProjectStart.classList.add('text-burgundy-600');
-                modalProjectDue.classList.add('text-burgundy-600');
-            } else {
-                modalDateHint.classList.add('hidden');
-                modalProjectStart.classList.remove('text-burgundy-600');
-                modalProjectDue.classList.remove('text-burgundy-600');
-            }
-
-            renderModalSubtasks();
-            
-            modal.classList.remove('invisible');
-            setTimeout(() => {
-                modal.classList.remove('opacity-0');
-                const content = modal.querySelector('.modal-content');
-                content.classList.remove('translate-y-8', 'scale-95');
-                content.classList.add('translate-y-0', 'scale-100');
-            }, 10);
-        };
-
-        window.closeModal = function() {
-            modal.classList.add('opacity-0');
-            const content = modal.querySelector('.modal-content');
-            content.classList.remove('translate-y-0', 'scale-100');
-            content.classList.add('translate-y-8', 'scale-95');
-            
-            setTimeout(() => {
-                modal.classList.add('invisible');
-                activeProjectId = null;
-                renderProjects(); 
-            }, 300);
-        };
-
-        // Mutators (Automatically triggering onSnapshot)
         projectForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const text = projectInput.value.trim();
             const start = projectStartInput.value;
             const due = projectDueInput.value;
-            const priority = projectPriorityInput.value;
-
-            if (start && due && new Date(start) > new Date(due)) {
-                showToast('Tenggat waktu tidak boleh lebih awal dari tanggal mulai!', 'error');
-                return;
-            }
-
+            if (start && due && new Date(start) > new Date(due)) { showToast('Tenggat waktu salah!', 'error'); return; }
             if (text) {
-                const newProject = {
-                    id: Date.now(),
-                    text: text,
-                    status: 'Plan',
-                    priority: priority,
-                    startDate: start,
-                    dueDate: due,
-                    subtasks: []
-                };
-                window.saveProject(newProject);
-                projectInput.value = '';
-                projectStartInput.value = '';
-                projectDueInput.value = '';
-                projectPriorityInput.value = 'Sedang';
+                saveData('projects', { id: Date.now(), text: text, status: 'Plan', priority: projectPriorityInput.value, startDate: start, dueDate: due, subtasks: [] });
+                projectInput.value = ''; projectStartInput.value = ''; projectDueInput.value = ''; projectPriorityInput.value = 'Sedang';
             }
         });
+
+        window.openModal = function(projectId) {
+            activeProjectId = projectId; const project = tasks.find(t => t.id === projectId); if (!project) return;
+            modalTitle.textContent = project.text || 'Tanpa Judul';
+            modalProjectPriority.value = project.priority || 'Sedang'; setModalPriorityColor(project.priority || 'Sedang');
+            const finalDates = getFinalProjectDates(project);
+            modalProjectStart.value = finalDates.start || ''; modalProjectDue.value = finalDates.due || '';
+            if(finalDates.isAuto) { modalDateHint.classList.remove('hidden'); modalProjectStart.classList.add('text-burgundy-600'); modalProjectDue.classList.add('text-burgundy-600'); } 
+            else { modalDateHint.classList.add('hidden'); modalProjectStart.classList.remove('text-burgundy-600'); modalProjectDue.classList.remove('text-burgundy-600'); }
+            renderModalSubtasks();
+            modal.classList.remove('invisible');
+            setTimeout(() => { modal.classList.remove('opacity-0'); modal.querySelector('.modal-content').classList.remove('translate-y-8', 'scale-95'); modal.querySelector('.modal-content').classList.add('translate-y-0', 'scale-100'); }, 10);
+        };
+        window.closeModal = function() {
+            modal.classList.add('opacity-0'); modal.querySelector('.modal-content').classList.remove('translate-y-0', 'scale-100'); modal.querySelector('.modal-content').classList.add('translate-y-8', 'scale-95');
+            setTimeout(() => { modal.classList.add('invisible'); activeProjectId = null; renderProjects(); }, 300);
+        };
+        modal.addEventListener('mousedown', (e) => { if (e.target === modal) window.closeModal(); });
 
         window.updateActiveProject = function(field, value) {
-            if (!activeProjectId) return;
-            const project = tasks.find(t => t.id === activeProjectId);
+            if (!activeProjectId) return; const project = tasks.find(t => t.id === activeProjectId);
             if (project) {
                 project[field] = value;
-                if (field === 'startDate' || field === 'dueDate') {
-                    const s = project.startDate;
-                    const d = project.dueDate;
-                    if (s && d && new Date(s) > new Date(d)) {
-                        showToast('Tenggat waktu tidak boleh lebih awal dari tanggal mulai!', 'error');
-                        project[field] = ''; 
-                    }
-                }
-                if (field === 'priority') {
-                    setModalPriorityColor(value);
-                }
-                window.saveProject(project);
+                if ((field === 'startDate' || field === 'dueDate') && project.startDate && project.dueDate && new Date(project.startDate) > new Date(project.dueDate)) { showToast('Tanggal salah!', 'error'); project[field] = ''; }
+                if (field === 'priority') setModalPriorityColor(value);
+                saveData('projects', project);
             }
         };
 
-        window.editProjectGrid = function(event, projectId) {
-            event.stopPropagation();
-            const project = tasks.find(t => t.id === projectId);
-            if(project) {
-                window.showPrompt("Ubah nama proyek:", project.text, (newName) => {
-                    if(newName && newName.trim() !== "") {
-                        project.text = newName.trim();
-                        window.saveProject(project);
-                    }
-                });
-            }
-        };
-
-        window.editActiveProjectName = function() {
-            if(!activeProjectId) return;
-            const project = tasks.find(t => t.id === activeProjectId);
-            if(project) {
-                window.showPrompt("Ubah nama proyek:", project.text, (newName) => {
-                    if(newName && newName.trim() !== "") {
-                        project.text = newName.trim();
-                        window.saveProject(project);
-                    }
-                });
-            }
-        };
-
-        window.editSubtask = function(subId) {
-            if (!activeProjectId) return;
-            const project = tasks.find(t => t.id === activeProjectId);
-            if (project) {
-                const subtask = project.subtasks.find(s => s.id === subId);
-                if (subtask) {
-                    window.showPrompt("Ubah nama detail pekerjaan:", subtask.text, (newName) => {
-                        if(newName && newName.trim() !== "") {
-                            subtask.text = newName.trim();
-                            window.saveProject(project);
-                        }
-                    });
-                }
-            }
-        };
-
-        window.editSubSubtask = function(subId, ssId) {
-            event.stopPropagation();
-            if (!activeProjectId) return;
-            const project = tasks.find(t => t.id === activeProjectId);
-            if (project) {
-                const subtask = project.subtasks.find(s => s.id === subId);
-                if (subtask && subtask.subSubtasks) {
-                    const ss = subtask.subSubtasks.find(s => s.id === ssId);
-                    if(ss) {
-                        window.showPrompt("Ubah nama sub-detail:", ss.text, (newName) => {
-                            if(newName && newName.trim() !== "") {
-                                ss.text = newName.trim();
-                                window.saveProject(project);
-                            }
-                        });
-                    }
-                }
-            }
-        };
-
-        window.updateSubtaskDate = function(subId, field, value) {
-            if (!activeProjectId) return;
-            const project = tasks.find(t => t.id === activeProjectId);
-            if (project) {
-                const subtask = project.subtasks.find(s => s.id === subId);
-                if (subtask) {
-                    subtask[field] = value;
-                    if (subtask.startDate && subtask.dueDate && new Date(subtask.startDate) > new Date(subtask.dueDate)) {
-                        showToast('Tenggat waktu tidak boleh lebih awal dari tanggal mulai!', 'error');
-                        subtask[field] = ''; 
-                    }
-                    window.saveProject(project);
-                }
-            }
-        };
-
-        window.updateSubtaskStatus = function(subId, value) {
-            if (!activeProjectId) return;
-            const project = tasks.find(t => t.id === activeProjectId);
-            if (project) {
-                const subtask = project.subtasks.find(s => s.id === subId);
-                if (subtask) {
-                    subtask.status = value;
-                    if (value === 'Execute' && project.status === 'Plan') {
-                        project.status = 'Execute';
-                    }
-                    window.saveProject(project);
-                }
-            }
-        };
-
-        window.updateSubtaskPriority = function(subId, value) {
-            if (!activeProjectId) return;
-            const project = tasks.find(t => t.id === activeProjectId);
-            if (project) {
-                const subtask = project.subtasks.find(s => s.id === subId);
-                if (subtask) {
-                    subtask.priority = value;
-                    window.saveProject(project);
-                }
-            }
-        };
+        window.editProjectGrid = function(event, id) { event.stopPropagation(); const p = tasks.find(t => t.id === id); if(p) window.showPrompt("Ubah nama proyek:", p.text, (newName) => { if(newName.trim()) { p.text = newName.trim(); saveData('projects', p); }}); };
+        window.editActiveProjectName = function() { if(!activeProjectId) return; const p = tasks.find(t => t.id === activeProjectId); if(p) window.showPrompt("Ubah nama proyek:", p.text, (newName) => { if(newName.trim()) { p.text = newName.trim(); saveData('projects', p); }}); };
+        window.editSubtask = function(subId) { if (!activeProjectId) return; const p = tasks.find(t => t.id === activeProjectId); if(p) { const sub = p.subtasks.find(s => s.id === subId); if(sub) window.showPrompt("Ubah nama detail:", sub.text, (newName) => { if(newName.trim()) { sub.text = newName.trim(); saveData('projects', p); }}); } };
+        window.editSubSubtask = function(subId, ssId) { event.stopPropagation(); if (!activeProjectId) return; const p = tasks.find(t => t.id === activeProjectId); if (p) { const sub = p.subtasks.find(s => s.id === subId); if(sub && sub.subSubtasks) { const ss = sub.subSubtasks.find(s => s.id === ssId); if(ss) window.showPrompt("Ubah nama sub-detail:", ss.text, (newName) => { if(newName.trim()) { ss.text = newName.trim(); saveData('projects', p); }}); } } };
+        window.updateSubtaskDate = function(subId, field, value) { if (!activeProjectId) return; const p = tasks.find(t => t.id === activeProjectId); if (p) { const sub = p.subtasks.find(s => s.id === subId); if (sub) { sub[field] = value; if (sub.startDate && sub.dueDate && new Date(sub.startDate) > new Date(sub.dueDate)) { showToast('Tanggal salah!', 'error'); sub[field] = ''; } saveData('projects', p); } } };
+        window.updateSubtaskStatus = function(subId, value) { if (!activeProjectId) return; const p = tasks.find(t => t.id === activeProjectId); if (p) { const sub = p.subtasks.find(s => s.id === subId); if (sub) { sub.status = value; if (value === 'Execute' && p.status === 'Plan') p.status = 'Execute'; saveData('projects', p); } } };
+        window.updateSubtaskPriority = function(subId, value) { if (!activeProjectId) return; const p = tasks.find(t => t.id === activeProjectId); if (p) { const sub = p.subtasks.find(s => s.id === subId); if (sub) { sub.priority = value; saveData('projects', p); } } };
 
         subtaskForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (!activeProjectId) return;
-            
-            const text = subtaskInput.value.trim();
-            if (text) {
-                const project = tasks.find(t => t.id === activeProjectId);
-                if (project) {
-                    if (!project.subtasks) project.subtasks = [];
-                    project.subtasks.push({
-                        id: Date.now(),
-                        text: text,
-                        completed: false,
-                        subSubtasks: [],
-                        expanded: false,
-                        startDate: '',
-                        dueDate: '',
-                        status: 'Plan',
-                        priority: 'Sedang'
-                    });
-                    window.saveProject(project);
-                    subtaskInput.value = '';
-                    
-                    setTimeout(() => {
-                        const list = document.getElementById('modal-subtask-list');
-                        if (list) list.scrollTop = list.scrollHeight;
-                    }, 50);
-                }
-            }
+            e.preventDefault(); if (!activeProjectId) return; const text = subtaskInput.value.trim();
+            if (text) { const p = tasks.find(t => t.id === activeProjectId); if (p) { if (!p.subtasks) p.subtasks = []; p.subtasks.push({ id: Date.now(), text: text, completed: false, subSubtasks: [], expanded: false, startDate: '', dueDate: '', status: 'Plan', priority: 'Sedang' }); saveData('projects', p); subtaskInput.value = ''; setTimeout(() => { const list = document.getElementById('modal-subtask-list'); if (list) list.scrollTop = list.scrollHeight; }, 50); } }
         });
 
-        window.toggleSubtask = function(subId) {
-            if (!activeProjectId) return;
-            const project = tasks.find(t => t.id === activeProjectId);
-            if (project) {
-                const subtask = project.subtasks.find(s => s.id === subId);
-                if (subtask) {
-                    const newStatus = !subtask.completed;
-                    subtask.completed = newStatus;
-                    if(newStatus) subtask.status = 'Finish';
-                    if (subtask.subSubtasks) {
-                        subtask.subSubtasks.forEach(ss => ss.completed = newStatus);
-                    }
-                    window.saveProject(project);
-                }
-            }
-        };
+        window.toggleSubtask = function(subId) { if (!activeProjectId) return; const p = tasks.find(t => t.id === activeProjectId); if (p) { const sub = p.subtasks.find(s => s.id === subId); if (sub) { const ns = !sub.completed; sub.completed = ns; if(ns) sub.status = 'Finish'; if (sub.subSubtasks) sub.subSubtasks.forEach(ss => ss.completed = ns); saveData('projects', p); } } };
+        window.toggleExpandSubtask = function(subId) { if (!activeProjectId) return; const p = tasks.find(t => t.id === activeProjectId); if (p) { const sub = p.subtasks.find(s => s.id === subId); if (sub) { sub.expanded = !sub.expanded; saveData('projects', p); if (sub.expanded) setTimeout(() => { const input = document.getElementById(`ss-input-${subId}`); if (input) input.focus(); }, 50); } } };
+        window.addSubSubtask = function(event, subId) { event.preventDefault(); const input = document.getElementById(`ss-input-${subId}`); const text = input.value.trim(); if (text && activeProjectId) { const p = tasks.find(t => t.id === activeProjectId); if (p) { const sub = p.subtasks.find(s => s.id === subId); if (sub) { if (!sub.subSubtasks) sub.subSubtasks = []; sub.subSubtasks.push({ id: Date.now(), text: text, completed: false }); sub.completed = false; if(sub.status === 'Finish') sub.status = 'Execute'; saveData('projects', p); setTimeout(() => { const el = document.getElementById(`ss-input-${subId}`); if(el) el.focus(); }, 50); } } } };
+        window.toggleSubSubtask = function(subId, ssId) { event.stopPropagation(); if (!activeProjectId) return; const p = tasks.find(t => t.id === activeProjectId); if (p) { const sub = p.subtasks.find(s => s.id === subId); if (sub && sub.subSubtasks) { const ss = sub.subSubtasks.find(s => s.id === ssId); if (ss) { ss.completed = !ss.completed; const allDone = sub.subSubtasks.every(x => x.completed); sub.completed = allDone; if(allDone) sub.status = 'Finish'; saveData('projects', p); } } } };
+        window.deleteSubSubtask = function(subId, ssId) { event.stopPropagation(); if (!activeProjectId) return; const p = tasks.find(t => t.id === activeProjectId); if (p) { const sub = p.subtasks.find(s => s.id === subId); if (sub && sub.subSubtasks) { sub.subSubtasks = sub.subSubtasks.filter(s => s.id !== ssId); if (sub.subSubtasks.length > 0) { const allDone = sub.subSubtasks.every(x => x.completed); sub.completed = allDone; if(allDone) sub.status = 'Finish'; } else sub.completed = false; saveData('projects', p); } } };
+        window.deleteSubtask = function(subId) { if (!activeProjectId) return; const pIndex = tasks.findIndex(t => t.id === activeProjectId); if (pIndex > -1) { tasks[pIndex].subtasks = tasks[pIndex].subtasks.filter(sub => sub.id !== subId); saveData('projects', tasks[pIndex]); } };
+        window.deleteActiveProject = function() { if (!activeProjectId) return; window.showConfirm('Hapus proyek ini?', () => { deleteData('projects', activeProjectId); window.closeModal(); }); };
+        window.deleteProjectFromGrid = function(event, projectId) { event.stopPropagation(); window.showConfirm('Hapus proyek ini?', () => deleteData('projects', projectId)); };
 
-        window.toggleExpandSubtask = function(subId) {
-            if (!activeProjectId) return;
-            const project = tasks.find(t => t.id === activeProjectId);
-            if (project) {
-                const subtask = project.subtasks.find(s => s.id === subId);
-                if (subtask) {
-                    subtask.expanded = !subtask.expanded;
-                    window.saveProject(project);
-                    if (subtask.expanded) {
-                        setTimeout(() => {
-                            const input = document.getElementById(`ss-input-${subId}`);
-                            if (input) input.focus();
-                        }, 50);
-                    }
-                }
-            }
-        };
-
-        window.addSubSubtask = function(event, subId) {
-            event.preventDefault();
-            const input = document.getElementById(`ss-input-${subId}`);
-            const text = input.value.trim();
-            
-            if (text && activeProjectId) {
-                const project = tasks.find(t => t.id === activeProjectId);
-                if (project) {
-                    const subtask = project.subtasks.find(s => s.id === subId);
-                    if (subtask) {
-                        if (!subtask.subSubtasks) subtask.subSubtasks = [];
-                        subtask.subSubtasks.push({ id: Date.now(), text: text, completed: false });
-                        subtask.completed = false;
-                        if(subtask.status === 'Finish') subtask.status = 'Execute';
-                        
-                        window.saveProject(project);
-                        
-                        setTimeout(() => {
-                           const el = document.getElementById(`ss-input-${subId}`);
-                           if(el) el.focus();
-                        }, 50);
-                    }
-                }
-            }
-        };
-
-        window.toggleSubSubtask = function(subId, ssId) {
-            event.stopPropagation();
-            if (!activeProjectId) return;
-            const project = tasks.find(t => t.id === activeProjectId);
-            if (project) {
-                const subtask = project.subtasks.find(s => s.id === subId);
-                if (subtask && subtask.subSubtasks) {
-                    const ss = subtask.subSubtasks.find(s => s.id === ssId);
-                    if (ss) {
-                        ss.completed = !ss.completed;
-                        const allDone = subtask.subSubtasks.every(x => x.completed);
-                        subtask.completed = allDone;
-                        if(allDone) subtask.status = 'Finish';
-                        
-                        window.saveProject(project);
-                    }
-                }
-            }
-        };
-
-        window.deleteSubSubtask = function(subId, ssId) {
-            event.stopPropagation();
-            if (!activeProjectId) return;
-            const project = tasks.find(t => t.id === activeProjectId);
-            if (project) {
-                const subtask = project.subtasks.find(s => s.id === subId);
-                if (subtask && subtask.subSubtasks) {
-                    subtask.subSubtasks = subtask.subSubtasks.filter(s => s.id !== ssId);
-                    if (subtask.subSubtasks.length > 0) {
-                        const allDone = subtask.subSubtasks.every(x => x.completed);
-                        subtask.completed = allDone;
-                        if(allDone) subtask.status = 'Finish';
-                    } else {
-                        subtask.completed = false;
-                    }
-                    window.saveProject(project);
-                }
-            }
-        };
-
-        window.deleteSubtask = function(subId) {
-            if (!activeProjectId) return;
-            const projectIndex = tasks.findIndex(t => t.id === activeProjectId);
-            if (projectIndex > -1) {
-                tasks[projectIndex].subtasks = tasks[projectIndex].subtasks.filter(sub => sub.id !== subId);
-                window.saveProject(tasks[projectIndex]);
-            }
-        };
-
-        window.deleteActiveProject = function() {
-            if (!activeProjectId) return;
-            window.showConfirm('Apakah Baginda yakin ingin menghapus proyek ini beserta seluruh detailnya?', () => {
-                window.deleteProjectData(activeProjectId);
-                window.closeModal();
-            });
-        };
-
-        window.deleteProjectFromGrid = function(event, projectId) {
-            event.stopPropagation(); 
-            window.showConfirm('Apakah Baginda yakin ingin menghapus proyek ini beserta seluruh detailnya?', () => {
-                window.deleteProjectData(projectId);
-            });
-        };
-
-        modal.addEventListener('mousedown', (e) => {
-            if (e.target === modal) window.closeModal();
-        });
-
-        // --- Firebase Initialization & Auto-sync ---
-        async function initApp() {
-            try {
-                const userCredential = await signInAnonymously(auth);
-                user = userCredential.user;
-            } catch (error) {
-                console.warn("Gagal terhubung dengan Anonymous Auth. Lanjut memuat (mungkin database diamankan).", error);
-            }
-
-            if (!user) {
-                console.warn("User tak terautentikasi. Jika rules Firebase ketat, seluruh operasi akan diblokir.");
-                return;
-            }
-
-            const projectsRef = collection(db, 'projects');
-            onSnapshot(projectsRef, (snapshot) => {
-                tasks = snapshot.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
-                
-                // Urutkan Proyek: Prioritas Tinggi diutamakan, kemudian waktu terbaru
-                tasks.sort((a, b) => {
-                    const wA = priorityWeights[a.priority || 'Sedang'];
-                    const wB = priorityWeights[b.priority || 'Sedang'];
-                    if (wA !== wB) return wB - wA; // Tinggi didahulukan
-                    return b.id - a.id; // Terbaru di atas
-                });
-                
-                renderProjects();
-                
-                // Jika modal sedang terbuka, perbarui UI Modal
-                if (activeProjectId) {
-                    const project = tasks.find(t => t.id === activeProjectId);
-                    if (project) {
-                        document.getElementById('modal-title').textContent = project.text;
-                        
-                        modalProjectPriority.value = project.priority || 'Sedang';
-                        setModalPriorityColor(project.priority || 'Sedang');
-
-                        const finalDates = getFinalProjectDates(project);
-                        
-                        modalProjectStart.value = finalDates.start || '';
-                        modalProjectDue.value = finalDates.due || '';
-                        if(finalDates.isAuto) {
-                            modalDateHint.classList.remove('hidden');
-                            modalProjectStart.classList.add('text-burgundy-600');
-                            modalProjectDue.classList.add('text-burgundy-600');
-                        } else {
-                            modalDateHint.classList.add('hidden');
-                            modalProjectStart.classList.remove('text-burgundy-600');
-                            modalProjectDue.classList.remove('text-burgundy-600');
-                        }
-                        renderModalSubtasks();
-                    } else {
-                        window.closeModal();
-                    }
-                }
-            }, (error) => {
-                console.error("Gagal sinkronisasi data:", error);
-                showToast("Koneksi gagal ke server (Periksa Firebase Rules).", "error");
-            });
+        // --- GLOBAL FIREBASE HELPERS ---
+        async function saveData(collectionName, data) {
+            if (!user) return;
+            try { await setDoc(doc(db, collectionName, String(data.id)), data); } catch (e) { showToast("Gagal menyimpan ke cloud.", "error"); }
+        }
+        async function deleteData(collectionName, id) {
+            if (!user) return;
+            try { await deleteDoc(doc(db, collectionName, String(id))); } catch (e) { showToast("Gagal menghapus dari cloud.", "error"); }
         }
 
+        // --- Init App ---
+        async function initApp() {
+            try { const uc = await signInAnonymously(auth); user = uc.user; } 
+            catch (error) { console.warn("Gagal Anon Auth."); }
+            if (!user) return;
+
+            onSnapshot(collection(db, 'projects'), (snap) => {
+                tasks = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
+                tasks.sort((a, b) => { const wA = priorityWeights[a.priority || 'Sedang']; const wB = priorityWeights[b.priority || 'Sedang']; if (wA !== wB) return wB - wA; return b.id - a.id; });
+                if (currentTab === 'projects') renderProjects();
+                if (activeProjectId) {
+                    const p = tasks.find(t => t.id === activeProjectId);
+                    if (p) {
+                        document.getElementById('modal-title').textContent = p.text;
+                        modalProjectPriority.value = p.priority || 'Sedang'; setModalPriorityColor(p.priority || 'Sedang');
+                        const finalDates = getFinalProjectDates(p);
+                        modalProjectStart.value = finalDates.start || ''; modalProjectDue.value = finalDates.due || '';
+                        if(finalDates.isAuto) { modalDateHint.classList.remove('hidden'); modalProjectStart.classList.add('text-burgundy-600'); modalProjectDue.classList.add('text-burgundy-600'); } else { modalDateHint.classList.add('hidden'); modalProjectStart.classList.remove('text-burgundy-600'); modalProjectDue.classList.remove('text-burgundy-600'); }
+                        renderModalSubtasks();
+                    } else window.closeModal();
+                }
+            });
+
+            onSnapshot(collection(db, 'journals'), (snap) => {
+                journals = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
+                journals.sort((a, b) => b.id - a.id);
+                if (currentTab === 'journals') { renderCalendar(); renderJournals(); }
+            });
+
+            onSnapshot(collection(db, 'routines'), (snap) => {
+                routines = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
+                routines.sort((a, b) => a.id - b.id);
+                if (currentTab === 'routines') { renderRoutines(); }
+            });
+        }
         initApp();
     </script>
 </body>
