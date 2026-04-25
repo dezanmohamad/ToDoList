@@ -355,10 +355,10 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase (Mendukung environment otomatis Canvas)
+        // Konfigurasi Firebase
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyAAj5a6tyrYxzAdNMfnMIb8ViDdd73subQ",
             authDomain: "todolist-d542d.firebaseapp.com",
@@ -371,7 +371,6 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
-        const provider = new GoogleAuthProvider();
 
         // Canvas App ID
         const artifactAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -1050,17 +1049,17 @@
         window.deleteActiveProject = function() { if (!activeProjectId) return; window.showConfirm('Hapus proyek ini?', () => { deleteData('projects', activeProjectId); window.closeModal(); }); };
         window.deleteProjectFromGrid = function(event, projectId) { event.stopPropagation(); window.showConfirm('Hapus proyek ini?', () => deleteData('projects', projectId)); };
 
-        // --- SMART PATH RESOLVER ---
+        // --- SMART PATH RESOLVER (MODE PUBLIK/KOLABORASI) ---
         const isPreview = typeof __firebase_config !== 'undefined';
 
         function getDbCollection(colName) {
-            if (isPreview) return collection(db, 'artifacts', artifactAppId, 'users', user.uid, colName);
-            return collection(db, 'users', user.uid, colName);
+            if (isPreview) return collection(db, 'artifacts', artifactAppId, 'public', 'data', colName);
+            return collection(db, colName); // Akses langsung ke koleksi utama (Shared)
         }
 
         function getDbDoc(colName, docId) {
-            if (isPreview) return doc(db, 'artifacts', artifactAppId, 'users', user.uid, colName, String(docId));
-            return doc(db, 'users', user.uid, colName, String(docId));
+            if (isPreview) return doc(db, 'artifacts', artifactAppId, 'public', 'data', colName, String(docId));
+            return doc(db, colName, String(docId)); // Akses langsung ke dokumen utama (Shared)
         }
 
         // --- GLOBAL FIREBASE HELPERS ---
@@ -1078,54 +1077,55 @@
         }
 
         // --- Init App ---
-        async function initApp() {
-            try {
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    const uc = await signInWithCustomToken(auth, __initial_auth_token);
-                    user = uc.user;
-                } else {
-                    const uc = await signInAnonymously(auth);
-                    user = uc.user;
+        function setupListeners() {
+            onSnapshot(getDbCollection('projects'), (snap) => {
+                tasks = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
+                tasks.sort((a, b) => { const wA = priorityWeights[a.priority || 'Sedang']; const wB = priorityWeights[b.priority || 'Sedang']; if (wA !== wB) return wB - wA; return b.id - a.id; });
+                if (currentTab === 'projects') renderProjects();
+                if (activeProjectId) {
+                    const p = tasks.find(t => t.id === activeProjectId);
+                    if (p) {
+                        document.getElementById('modal-title').textContent = p.text;
+                        modalProjectPriority.value = p.priority || 'Sedang'; setModalPriorityColor(p.priority || 'Sedang');
+                        const finalDates = getFinalProjectDates(p);
+                        modalProjectStart.value = finalDates.start || ''; modalProjectDue.value = finalDates.due || '';
+                        if(finalDates.isAuto) { modalDateHint.classList.remove('hidden'); modalProjectStart.classList.add('text-burgundy-600'); modalProjectDue.classList.add('text-burgundy-600'); } else { modalDateHint.classList.add('hidden'); modalProjectStart.classList.remove('text-burgundy-600'); modalProjectDue.classList.remove('text-burgundy-600'); }
+                        renderModalSubtasks();
+                    } else window.closeModal();
                 }
+            }, (error) => console.error("Error Proyek:", error));
 
-                if (!user) {
-                    showToast("Sesi tidak valid.", "error");
-                    return;
-                }
+            onSnapshot(getDbCollection('journals'), (snap) => {
+                journals = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
+                journals.sort((a, b) => b.id - a.id);
+                if (currentTab === 'journals') { renderCalendar(); renderJournals(); }
+            }, (error) => console.error("Error Jurnal:", error));
 
-                onSnapshot(getDbCollection('projects'), (snap) => {
-                    tasks = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
-                    tasks.sort((a, b) => { const wA = priorityWeights[a.priority || 'Sedang']; const wB = priorityWeights[b.priority || 'Sedang']; if (wA !== wB) return wB - wA; return b.id - a.id; });
-                    if (currentTab === 'projects') renderProjects();
-                    if (activeProjectId) {
-                        const p = tasks.find(t => t.id === activeProjectId);
-                        if (p) {
-                            document.getElementById('modal-title').textContent = p.text;
-                            modalProjectPriority.value = p.priority || 'Sedang'; setModalPriorityColor(p.priority || 'Sedang');
-                            const finalDates = getFinalProjectDates(p);
-                            modalProjectStart.value = finalDates.start || ''; modalProjectDue.value = finalDates.due || '';
-                            if(finalDates.isAuto) { modalDateHint.classList.remove('hidden'); modalProjectStart.classList.add('text-burgundy-600'); modalProjectDue.classList.add('text-burgundy-600'); } else { modalDateHint.classList.add('hidden'); modalProjectStart.classList.remove('text-burgundy-600'); modalProjectDue.classList.remove('text-burgundy-600'); }
-                            renderModalSubtasks();
-                        } else window.closeModal();
-                    }
-                }, (error) => console.error("Error Proyek:", error));
+            onSnapshot(getDbCollection('routines'), (snap) => {
+                routines = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
+                routines.sort((a, b) => a.id - b.id);
+                if (currentTab === 'routines') { renderRoutines(); }
+            }, (error) => console.error("Error Rutinitas:", error));
+        }
 
-                onSnapshot(getDbCollection('journals'), (snap) => {
-                    journals = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
-                    journals.sort((a, b) => b.id - a.id);
-                    if (currentTab === 'journals') { renderCalendar(); renderJournals(); }
-                }, (error) => console.error("Error Jurnal:", error));
-
-                onSnapshot(getDbCollection('routines'), (snap) => {
-                    routines = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
-                    routines.sort((a, b) => a.id - b.id);
-                    if (currentTab === 'routines') { renderRoutines(); }
-                }, (error) => console.error("Error Rutinitas:", error));
-
-            } catch (error) {
-                console.error("Autentikasi Gagal:", error);
-                showToast("Sistem gagal terhubung ke database.", "error");
+        function initApp() {
+            // 1. Coba login (Canvas token atau Anonim untuk akses publik)
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                signInWithCustomToken(auth, __initial_auth_token).catch(console.error);
+            } else {
+                // Gunakan Login Anonim agar siapa saja yang punya link bisa langsung akses tanpa popup
+                signInAnonymously(auth).catch(console.error);
             }
+
+            // 2. Pantau Perubahan Status Login
+            onAuthStateChanged(auth, (currentUser) => {
+                if (currentUser) {
+                    user = currentUser;
+                    setupListeners(); // Tarik data kolaborasi
+                } else {
+                    console.warn("Menunggu sesi tamu...");
+                }
+            });
         }
         
         initApp();
