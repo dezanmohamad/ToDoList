@@ -355,7 +355,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
         // Konfigurasi Firebase (Mendukung environment otomatis Canvas)
@@ -371,6 +371,7 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+        const provider = new GoogleAuthProvider();
 
         // Canvas App ID
         const artifactAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
@@ -398,7 +399,7 @@
             'Rendah': 'text-slate-500'
         };
 
-        const todayStringId = new Date().toLocaleDateString('en-CA'); // Format YYYY-MM-DD standar perbandingan
+        const todayStringId = new Date().toLocaleDateString('en-CA');
 
         // --- DOM Elements ---
         const projectForm = document.getElementById('project-form');
@@ -422,7 +423,6 @@
         const subtaskForm = document.getElementById('subtask-form');
         const subtaskInput = document.getElementById('subtask-input');
 
-        // Tab DOM
         const tabProjects = document.getElementById('tab-projects');
         const tabJournals = document.getElementById('tab-journals');
         const tabRoutines = document.getElementById('tab-routines');
@@ -430,7 +430,6 @@
         const journalView = document.getElementById('journal-view');
         const routineView = document.getElementById('routine-view');
 
-        // Journal DOM
         const journalForm = document.getElementById('journal-form');
         const journalTypeInput = document.getElementById('journal-type');
         const journalContentInput = document.getElementById('journal-content');
@@ -438,7 +437,6 @@
         const journalEmptyState = document.getElementById('journal-empty-state');
         const formDateDisplay = document.getElementById('form-date-display');
 
-        // Routine DOM
         const routineForm = document.getElementById('routine-form');
         const routineInput = document.getElementById('routine-input');
         const routineList = document.getElementById('routine-list');
@@ -448,12 +446,10 @@
         const trackerDaysHeader = document.getElementById('tracker-days-header');
         const trackerHeaderContainer = document.getElementById('routine-tracker-header');
 
-        // State Kalender Jurnal
         let navMonth = new Date().getMonth();
         let navYear = new Date().getFullYear();
         let selectedJournalDate = todayStringId; 
 
-        // Set Text Date for Routines
         routineTodayDate.textContent = new Date().toLocaleDateString('id-ID', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
 
         // --- Toast & Modals Logic ---
@@ -527,13 +523,11 @@
             }
         });
 
-        // --- Core Formatting ---
         function escapeHTML(str) {
             if (str === null || str === undefined) return '';
             return String(str).replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
         }
 
-        // --- TAB NAVIGATION ---
         window.switchTab = function(tabName) {
             currentTab = tabName;
             const tabs = {
@@ -558,13 +552,10 @@
             if (tabName === 'routines') { renderRoutines(); }
         };
 
-        // ==================== RUTINITAS HARIAN LOGIC (Streak Tracker) ====================
-        
-        // Buat array 1 minggu ini (Senin - Minggu)
         const currentWeek = Array.from({length: 7}, (_, i) => {
             const d = new Date();
             const day = d.getDay();
-            const diff = d.getDate() - day + (day === 0 ? -6 : 1); // Mulai dari Senin
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
             d.setDate(diff + i);
             return d;
         });
@@ -587,7 +578,6 @@
             trackerHeaderContainer.classList.remove('hidden');
             trackerHeaderContainer.classList.add('sm:flex');
             
-            // Render Header Hari untuk Streak Tracker
             trackerDaysHeader.innerHTML = currentWeek.map((d) => {
                 const isToday = d.toLocaleDateString('en-CA') === todayStringId;
                 return `<div class="w-8 text-[10px] font-bold ${isToday ? 'text-burgundy-600' : 'text-slate-400'} uppercase tracking-tighter" title="${d.toLocaleDateString('id-ID')}">${daysLabels[d.getDay()]}</div>`;
@@ -601,7 +591,6 @@
                 
                 if (isCompletedToday) completedCount++;
 
-                // Buat kotak indikator untuk 1 minggu ini
                 let streakHtml = currentWeek.map((dateObj) => {
                     const dateStr = dateObj.toLocaleDateString('en-CA');
                     const done = completedDates.includes(dateStr);
@@ -624,9 +613,7 @@
                     
                     let borderClass = isToday ? 'ring-2 ring-offset-1 ring-burgundy-200' : '';
                     
-                    return `<div class="w-8 h-8 rounded-lg ${bgClass} ${borderClass} flex items-center justify-center transition-all" title="${dateObj.toLocaleDateString('id-ID')}">
-                                ${content}
-                            </div>`;
+                    return `<div class="w-8 h-8 rounded-lg ${bgClass} ${borderClass} flex items-center justify-center transition-all" title="${dateObj.toLocaleDateString('id-ID')}">${content}</div>`;
                 }).join('');
 
                 const li = document.createElement('li');
@@ -639,21 +626,11 @@
                         </div>
                         <span class="text-base font-medium select-none ${isCompletedToday ? 'text-slate-400 line-through' : 'text-slate-700'}">${escapeHTML(routine.text)}</span>
                     </div>
-                    
                     <div class="flex items-center justify-between sm:justify-end gap-4 w-full sm:w-auto pl-10 sm:pl-0">
-                        <!-- 7-Day Tracker -->
-                        <div class="flex gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">
-                            ${streakHtml}
-                        </div>
-
-                        <!-- Actions -->
+                        <div class="flex gap-1.5 opacity-80 group-hover:opacity-100 transition-opacity">${streakHtml}</div>
                         <div class="flex items-center gap-1 sm:opacity-0 group-hover:opacity-100 transition-opacity">
-                            <button onclick="editRoutine(${routine.id})" class="text-slate-400 hover:text-burgundy-600 p-1.5 sm:p-2 rounded-lg hover:bg-burgundy-50 transition-colors" title="Ubah Text">
-                                <i class="ph-bold ph-pencil-simple text-lg"></i>
-                            </button>
-                            <button onclick="deleteRoutine(${routine.id})" class="text-slate-300 hover:text-red-600 p-1.5 sm:p-2 rounded-lg hover:bg-red-50 transition-colors" title="Hapus Rutinitas">
-                                <i class="ph-bold ph-trash text-lg"></i>
-                            </button>
+                            <button onclick="editRoutine(${routine.id})" class="text-slate-400 hover:text-burgundy-600 p-1.5 sm:p-2 rounded-lg hover:bg-burgundy-50 transition-colors" title="Ubah Text"><i class="ph-bold ph-pencil-simple text-lg"></i></button>
+                            <button onclick="deleteRoutine(${routine.id})" class="text-slate-300 hover:text-red-600 p-1.5 sm:p-2 rounded-lg hover:bg-red-50 transition-colors" title="Hapus Rutinitas"><i class="ph-bold ph-trash text-lg"></i></button>
                         </div>
                     </div>
                 `;
@@ -668,12 +645,7 @@
             if (!user) return;
             const text = routineInput.value.trim();
             if (text) {
-                const newRoutine = {
-                    id: Date.now(),
-                    text: text,
-                    completedDates: [] 
-                };
-                saveData('routines', newRoutine);
+                saveData('routines', { id: Date.now(), text: text, completedDates: [] });
                 routineInput.value = '';
             }
         });
@@ -684,12 +656,8 @@
             if (routine) {
                 if (!routine.completedDates) routine.completedDates = [];
                 const idx = routine.completedDates.indexOf(todayStringId);
-                
-                if (idx > -1) {
-                    routine.completedDates.splice(idx, 1); 
-                } else {
-                    routine.completedDates.push(todayStringId); 
-                }
+                if (idx > -1) routine.completedDates.splice(idx, 1); 
+                else routine.completedDates.push(todayStringId); 
                 saveData('routines', routine);
             }
         };
@@ -709,13 +677,9 @@
 
         window.deleteRoutine = function(id) {
             event.stopPropagation();
-            window.showConfirm('Apakah Baginda yakin ingin menghapus rutinitas ini selamanya?', () => {
-                deleteData('routines', id);
-            });
+            window.showConfirm('Apakah Baginda yakin ingin menghapus rutinitas ini selamanya?', () => deleteData('routines', id));
         };
 
-
-        // ==================== JURNAL LOGIC ====================
         window.changeMonth = function(dir) {
             navMonth += dir;
             if (navMonth > 11) { navMonth = 0; navYear++; }
@@ -825,9 +789,6 @@
             window.showConfirm('Apakah Baginda yakin ingin menghapus catatan jurnal ini?', () => deleteData('journals', id));
         };
 
-
-        // ==================== PROYEK LOGIC ====================
-        // (Tetap Mempertahankan Logika Lama)
         function calculateProgress(subtasks) {
             if (!subtasks || subtasks.length === 0) return 0;
             const completed = subtasks.filter(s => {
@@ -1089,60 +1050,84 @@
         window.deleteActiveProject = function() { if (!activeProjectId) return; window.showConfirm('Hapus proyek ini?', () => { deleteData('projects', activeProjectId); window.closeModal(); }); };
         window.deleteProjectFromGrid = function(event, projectId) { event.stopPropagation(); window.showConfirm('Hapus proyek ini?', () => deleteData('projects', projectId)); };
 
+        // --- SMART PATH RESOLVER ---
+        const isPreview = typeof __firebase_config !== 'undefined';
+
+        function getDbCollection(colName) {
+            if (isPreview) return collection(db, 'artifacts', artifactAppId, 'users', user.uid, colName);
+            return collection(db, 'users', user.uid, colName);
+        }
+
+        function getDbDoc(colName, docId) {
+            if (isPreview) return doc(db, 'artifacts', artifactAppId, 'users', user.uid, colName, String(docId));
+            return doc(db, 'users', user.uid, colName, String(docId));
+        }
+
         // --- GLOBAL FIREBASE HELPERS ---
         async function saveData(collectionName, data) {
             if (!user) return;
-            try { await setDoc(doc(db, 'artifacts', artifactAppId, 'users', user.uid, collectionName, String(data.id)), data); } catch (e) { showToast("Gagal menyimpan ke cloud.", "error"); }
+            try { 
+                await setDoc(getDbDoc(collectionName, data.id), data); 
+            } catch (e) { showToast("Gagal menyimpan ke cloud.", "error"); console.error(e); }
         }
         async function deleteData(collectionName, id) {
             if (!user) return;
-            try { await deleteDoc(doc(db, 'artifacts', artifactAppId, 'users', user.uid, collectionName, String(id))); } catch (e) { showToast("Gagal menghapus dari cloud.", "error"); }
+            try { 
+                await deleteDoc(getDbDoc(collectionName, id)); 
+            } catch (e) { showToast("Gagal menghapus dari cloud.", "error"); console.error(e); }
         }
 
         // --- Init App ---
         async function initApp() {
-            try { 
+            try {
                 if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
                     const uc = await signInWithCustomToken(auth, __initial_auth_token);
                     user = uc.user;
                 } else {
-                    const uc = await signInAnonymously(auth); 
-                    user = uc.user; 
+                    const uc = await signInAnonymously(auth);
+                    user = uc.user;
                 }
-            } 
-            catch (error) { console.warn("Gagal Auth.", error); }
-            
-            if (!user) return;
 
-            onSnapshot(collection(db, 'artifacts', artifactAppId, 'users', user.uid, 'projects'), (snap) => {
-                tasks = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
-                tasks.sort((a, b) => { const wA = priorityWeights[a.priority || 'Sedang']; const wB = priorityWeights[b.priority || 'Sedang']; if (wA !== wB) return wB - wA; return b.id - a.id; });
-                if (currentTab === 'projects') renderProjects();
-                if (activeProjectId) {
-                    const p = tasks.find(t => t.id === activeProjectId);
-                    if (p) {
-                        document.getElementById('modal-title').textContent = p.text;
-                        modalProjectPriority.value = p.priority || 'Sedang'; setModalPriorityColor(p.priority || 'Sedang');
-                        const finalDates = getFinalProjectDates(p);
-                        modalProjectStart.value = finalDates.start || ''; modalProjectDue.value = finalDates.due || '';
-                        if(finalDates.isAuto) { modalDateHint.classList.remove('hidden'); modalProjectStart.classList.add('text-burgundy-600'); modalProjectDue.classList.add('text-burgundy-600'); } else { modalDateHint.classList.add('hidden'); modalProjectStart.classList.remove('text-burgundy-600'); modalProjectDue.classList.remove('text-burgundy-600'); }
-                        renderModalSubtasks();
-                    } else window.closeModal();
+                if (!user) {
+                    showToast("Sesi tidak valid.", "error");
+                    return;
                 }
-            }, (error) => console.error("Error Proyek:", error));
 
-            onSnapshot(collection(db, 'artifacts', artifactAppId, 'users', user.uid, 'journals'), (snap) => {
-                journals = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
-                journals.sort((a, b) => b.id - a.id);
-                if (currentTab === 'journals') { renderCalendar(); renderJournals(); }
-            }, (error) => console.error("Error Jurnal:", error));
+                onSnapshot(getDbCollection('projects'), (snap) => {
+                    tasks = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
+                    tasks.sort((a, b) => { const wA = priorityWeights[a.priority || 'Sedang']; const wB = priorityWeights[b.priority || 'Sedang']; if (wA !== wB) return wB - wA; return b.id - a.id; });
+                    if (currentTab === 'projects') renderProjects();
+                    if (activeProjectId) {
+                        const p = tasks.find(t => t.id === activeProjectId);
+                        if (p) {
+                            document.getElementById('modal-title').textContent = p.text;
+                            modalProjectPriority.value = p.priority || 'Sedang'; setModalPriorityColor(p.priority || 'Sedang');
+                            const finalDates = getFinalProjectDates(p);
+                            modalProjectStart.value = finalDates.start || ''; modalProjectDue.value = finalDates.due || '';
+                            if(finalDates.isAuto) { modalDateHint.classList.remove('hidden'); modalProjectStart.classList.add('text-burgundy-600'); modalProjectDue.classList.add('text-burgundy-600'); } else { modalDateHint.classList.add('hidden'); modalProjectStart.classList.remove('text-burgundy-600'); modalProjectDue.classList.remove('text-burgundy-600'); }
+                            renderModalSubtasks();
+                        } else window.closeModal();
+                    }
+                }, (error) => console.error("Error Proyek:", error));
 
-            onSnapshot(collection(db, 'artifacts', artifactAppId, 'users', user.uid, 'routines'), (snap) => {
-                routines = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
-                routines.sort((a, b) => a.id - b.id);
-                if (currentTab === 'routines') { renderRoutines(); }
-            }, (error) => console.error("Error Rutinitas:", error));
+                onSnapshot(getDbCollection('journals'), (snap) => {
+                    journals = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
+                    journals.sort((a, b) => b.id - a.id);
+                    if (currentTab === 'journals') { renderCalendar(); renderJournals(); }
+                }, (error) => console.error("Error Jurnal:", error));
+
+                onSnapshot(getDbCollection('routines'), (snap) => {
+                    routines = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
+                    routines.sort((a, b) => a.id - b.id);
+                    if (currentTab === 'routines') { renderRoutines(); }
+                }, (error) => console.error("Error Rutinitas:", error));
+
+            } catch (error) {
+                console.error("Autentikasi Gagal:", error);
+                showToast("Sistem gagal terhubung ke database.", "error");
+            }
         }
+        
         initApp();
     </script>
 </body>
