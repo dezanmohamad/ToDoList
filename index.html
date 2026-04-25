@@ -355,11 +355,11 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Konfigurasi Firebase
-        const firebaseConfig = {
+        // Konfigurasi Firebase (Mendukung environment otomatis Canvas)
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {
             apiKey: "AIzaSyAAj5a6tyrYxzAdNMfnMIb8ViDdd73subQ",
             authDomain: "todolist-d542d.firebaseapp.com",
             projectId: "todolist-d542d",
@@ -371,6 +371,9 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
+
+        // Canvas App ID
+        const artifactAppId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
 
         // --- State Management ---
         let tasks = [];
@@ -1089,20 +1092,29 @@
         // --- GLOBAL FIREBASE HELPERS ---
         async function saveData(collectionName, data) {
             if (!user) return;
-            try { await setDoc(doc(db, collectionName, String(data.id)), data); } catch (e) { showToast("Gagal menyimpan ke cloud.", "error"); }
+            try { await setDoc(doc(db, 'artifacts', artifactAppId, 'users', user.uid, collectionName, String(data.id)), data); } catch (e) { showToast("Gagal menyimpan ke cloud.", "error"); }
         }
         async function deleteData(collectionName, id) {
             if (!user) return;
-            try { await deleteDoc(doc(db, collectionName, String(id))); } catch (e) { showToast("Gagal menghapus dari cloud.", "error"); }
+            try { await deleteDoc(doc(db, 'artifacts', artifactAppId, 'users', user.uid, collectionName, String(id))); } catch (e) { showToast("Gagal menghapus dari cloud.", "error"); }
         }
 
         // --- Init App ---
         async function initApp() {
-            try { const uc = await signInAnonymously(auth); user = uc.user; } 
-            catch (error) { console.warn("Gagal Anon Auth."); }
+            try { 
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    const uc = await signInWithCustomToken(auth, __initial_auth_token);
+                    user = uc.user;
+                } else {
+                    const uc = await signInAnonymously(auth); 
+                    user = uc.user; 
+                }
+            } 
+            catch (error) { console.warn("Gagal Auth.", error); }
+            
             if (!user) return;
 
-            onSnapshot(collection(db, 'projects'), (snap) => {
+            onSnapshot(collection(db, 'artifacts', artifactAppId, 'users', user.uid, 'projects'), (snap) => {
                 tasks = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
                 tasks.sort((a, b) => { const wA = priorityWeights[a.priority || 'Sedang']; const wB = priorityWeights[b.priority || 'Sedang']; if (wA !== wB) return wB - wA; return b.id - a.id; });
                 if (currentTab === 'projects') renderProjects();
@@ -1117,19 +1129,19 @@
                         renderModalSubtasks();
                     } else window.closeModal();
                 }
-            });
+            }, (error) => console.error("Error Proyek:", error));
 
-            onSnapshot(collection(db, 'journals'), (snap) => {
+            onSnapshot(collection(db, 'artifacts', artifactAppId, 'users', user.uid, 'journals'), (snap) => {
                 journals = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
                 journals.sort((a, b) => b.id - a.id);
                 if (currentTab === 'journals') { renderCalendar(); renderJournals(); }
-            });
+            }, (error) => console.error("Error Jurnal:", error));
 
-            onSnapshot(collection(db, 'routines'), (snap) => {
+            onSnapshot(collection(db, 'artifacts', artifactAppId, 'users', user.uid, 'routines'), (snap) => {
                 routines = snap.docs.map(doc => ({ id: Number(doc.id), ...doc.data() }));
                 routines.sort((a, b) => a.id - b.id);
                 if (currentTab === 'routines') { renderRoutines(); }
-            });
+            }, (error) => console.error("Error Rutinitas:", error));
         }
         initApp();
     </script>
